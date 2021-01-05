@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hash</title>
+    <link href="/assets/css/index.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div style="display:flex;">
+        <textarea id="data" style="height:100px; width:400px" oninput="dataChange()"></textarea>
+        <div style="display: flex;flex-direction: column;margin-left: 20px;text-align: right;">
+            <span>表长：<input id="length" type="number" value="16" style="width: 100px;"/></span>
+            <div id="directAddr-value" style="display: inline-grid;">
+                <span>a：<input id="a" type="number" value="1" style="width: 100px;"/></span>
+                <span>b：<input id="b" type="number" value="0" style="width: 100px;"/></span>
+            </div>
+            <span id="mod-area">p：<input id="p" type="number" value="13" style="width: 100px;"/></span>
+            <span id="reHash-area" style="display: none;">再哈希函数：<input id="reHashExp" type="text" value="key%13+1,key%13+2,key%13+3,key%13+4,key%13+5,key%13+6,key%13+7,key%13+8,key%13+9,key%13+10,key%13+11" style="width: 100px;"/></span>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="select-area">
+        <div id="constructor-area" style="display: flex;flex-direction: column;">
+            <span style="text-align: center;">构造方法</span>
+            <ul class="select-option" onchange="constructorChange()">
+                <li>
+                    <input type="radio" name="constructor" value='directAddr'>直接定址法(不会产生冲突)
+                </li>
+                <li>
+                    <input type="radio" name="constructor" value='digitAnalyze'>数字分析法
+                </li>
+                <li>
+                    <input type="radio" name="constructor" value='square' checked>平方取中法
+                </li>
+                <li>
+                    <input type="radio" name="constructor" value='fold'>折叠法
+                </li>
+                <li>
+                    <input type="radio" name="constructor" value='mod'>除留取余法
+                </li>
+            </ul>
+        </div>
+        <div id="collision-area" style="display: none;flex-direction: column;">
+            <span style="text-align: center;">冲突处理方法</span>
+            <ul class="select-option" onchange="collisionChange()">
+                <li>
+                    <input type="radio" name="collision" value="OALine">开放定址法(线性探测再散列)
+                </li>
+                <li>
+                    <input type="radio" name="collision" value="OASecond" >开放定址法(二次探测再散列)
+                </li>
+                <li>
+                    <input type="radio" name="collision" value="OARand" >开放定址法(伪随机序列)
+                </li>
+                <li>
+                    <input type="radio" name="collision" value="reHash" checked>再哈希法
+                </li>
+                <li>
+                    <input type="radio" name="collision" value="ListAddr" >链地址法
+                </li>
+                <li>
+                    <input type="radio" name="collision" value="overArr" >溢出区法(顺序)
+                </li>
+                <li>
+                    <input type="radio" name="collision" value="overList" >溢出区法(链式)
+                </li>
+            </ul>
+        </div>
+        <button onclick="genHashTable()">生成哈希表</button>
+    </div>
+    <p id="result" style="word-break:break-all;"></p>
+
+    <div></div>
+    <script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <script src="//upcdn.b0.upaiyun.com/libs/jqueryui/jquery.ui-1.10.3.min.js"></script>
+    <script src="./assets/js/list.js"></script>
+    <script src="./assets/js/stack.js"></script>
+    <script src="./assets/js/hash.js"></script>
+    <script>
+        var isbn, square, student;
+        function dataChange(){
+            let constructor = getConstructor();
+            console.log(constructor)
+            if('directAddr' === constructor || $('#length')[0].value < document.getElementById('data').value.split('\n').length){
+                $('#length')[0].value = document.getElementById('data').value.split('\n').length
+            }
+        }
+        function constructorChange(){
+            let constructor = getConstructor();
+            console.log(constructor)
+            if('mod' === constructor){
+                $('#mod-area').css('display', 'block');
+            }else{
+                $('#mod-area').css('display', 'none');
+            }
+            // 初始化数据：
+            switch(constructor){
+                case "directAddr":
+                    let data = ""
+                    for(var i = 1; i <= 100; i++){
+                        data += i + "," + (i * 100) + "\n"
+                    }
+                    document.getElementById('data').value = data
+                    break;
+                case "square":
+                    document.getElementById('data').value = square;
+                    break;
+                case "fold":
+                    $('#data')[0].value = isbn
+                    break;
+                case "digitAnalyze":
+                    $('#data')[0].value = student
+                    break;
+                default:
+                    document.getElementById('data').value = "19, 14, 23, 01, 68, 20, 84, 27, 55, 11, 10, 79"
+                    break;
+            }
+            if("directAddr" === constructor){
+                document.getElementById("collision-area").style['display'] = "none"
+                document.getElementById("directAddr-value").style['display'] = "inline-grid"
+                $('#reHash-area').css('display', 'none')
+            }else{
+                document.getElementById("collision-area").style['display'] = "flex"
+                document.getElementById("directAddr-value").style['display'] = "none"
+                collisionChange();
+            }
+            dataChange();
+        }
+        function collisionChange(){
+            let collision = getCollision();
+            if('reHash' === collision){
+                $('#reHash-area').css('display', 'block')
+            }else{
+                $('#reHash-area').css('display', 'none')
+            }
+        }
+    </script>
+    <script>
+
+        function genHashTable(){
+            let constructor = getConstructor();
+            let collision = getCollision();
+            let data = document.getElementById('data').value;
+            let length = parseInt($('#length')[0].value);
+
+            // console.log(data);
+            console.log('constructor->', constructor, '|', 'collision->', collision);
+
+            let ht = new HashTable(length, constructor, collision);
+
+            let exps = []
+            if('reHash' === collision){
+                exps = getReHashExp();
+                ht.setReHashExp(exps);
+            }
+            if('mod' === constructor){
+                ht.setP($('#p')[0].value)
+            }
+            if("directAddr" === constructor){
+                let a = parseInt(document.getElementById('a').value);
+                let b = parseInt(document.getElementById('b').value);
+                ht.setAB(a, b);
+                data = data.split(/\n/)
+                console.log(data)
+                data.forEach((ele)=>{
+                    if(ele.split(',').length < 2)return;
+                    ht.push(ele.split(',')[0], ele.split(',')[1]);
+                })
+            }else if("fold" === constructor){
+                data = data.split(/\n/)
+                console.log(data)
+                data.forEach((ele)=>{
+                    ht.push(ele);
+                })
+            }else if("digitAnalyze" === constructor){
+                data = data.split(/\n/)
+                data.forEach((ele)=>{
+                    ht.push(ele);
+                })
+            }else{
+                data = data.split(',');
+
+                data.forEach((element) => {
+                    ht.push(element);
+                });
+
+            }
+            console.log(ht.storage);
+
+            document.getElementById("result").innerHTML=ht.toString();
+        }
+
+        function getReHashExp(){
+            let exp = $('#reHashExp')[0].value
+            return exp.split(',')
+        }
+        function getConstructor() {
+            let c = document.getElementsByName('constructor')
+            for (var i = 0; i < c.length; i++) {
+                if (c[i].checked) {
+                    return c[i].value;
+                    break;
+                }
+            }
+        }
+
+        function getCollision(){
+            let c = document.getElementsByName('collision')
+            for (var i = 0; i < c.length; i++) {
+                if (c[i].checked) {
+                    return c[i].value;
+                    break;
+                }
+            }
+        }
+    </script>
+    <script>
+        // 初始化
+        getData();
+        constructorChange();
+        collisionChange();
+
+
+        function getData(){
+            $.ajax({
+                url:"data/isbn.txt",
+                async:true,
+                success:function(result){
+                    // console.log(result)
+                    isbn = result;
+                }
+            })
+            $.ajax({
+                url:"data/square.txt",
+                async:true,
+                success:function(result){
+                    // console.log(result)
+                    square = result;
+                }
+            })
+            $.ajax({
+                url:"data/student.txt",
+                async:true,
+                success:function(result){
+                    // console.log(result)
+                    student = result;
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>

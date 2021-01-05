@@ -1,0 +1,8 @@
+
+.select-area{
+    display: flex;
+}
+.select-option{
+    list-style: none;
+    padding-inline-start: 0;
+}
