@@ -229,12 +229,17 @@ class HashTable {
     }
     // 溢出区
     searchOver(Hkey, key){
-        if(key === this.storage[Hkey])return true;
+        if(key === this.storage[Hkey])return [Hkey, key, false];
         if(ht.over instanceof SingleList)
         {
-            return null !== this.over.find(key);
-        }else
-        return -1 !== this.over.indexOf(key);
+            let result = this.over.find(key);
+            if(result)return [result[0], result[1].data];
+            return false;
+        }
+        let index = this.over.indexOf(key);
+        if(-1 !== index)
+            return [index, key, true];
+        return false;
     }
 
     // ==============构造=============
@@ -377,30 +382,37 @@ class HashTable {
 
     // 公共溢出区
     pushOverArr(Hkey, value) {
-        if (this.over === null) this.over = [];
         if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
+            // 冲突
+            if (this.over === null) this.over = [];
             this.over.push(value);
             this.queue.append("overArr," + value);
         } else {
+            // 无冲突
             this.storage[Hkey] = value;
             this.queue.append(Hkey + "," + value);
         }
     }
     pushOverList(Hkey, value) {
         if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
+            // 冲突了
             if (this.over === null) {
                 this.over = new SingleList();
                 this.over.append(value);
+                this.queue.append("overList," + value + ",0");
             } else {
                 // 有序插入
                 let currNode = this.over.head;
+                var i = 0;
                 while (currNode.next && currNode.next.data < value) {
+                    i++;
                     currNode = currNode.next;
                 }
                 this.over.insert(currNode.data, value);
-                this.queue.append("overList," + value);
+                this.queue.append("overList," + value + "," + i);
             }
         } else {
+            // 无冲突
             this.storage[Hkey] = value;
             this.queue.append(Hkey + "," + value);
         }

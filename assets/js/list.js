@@ -16,12 +16,13 @@ class SingleList {
     // 在单链表中寻找item元素
     find(item){
         let currNode = this.head;
-
+        var i = 0;
         while (currNode && item !== currNode.data) {
+            i++;
             currNode = currNode.next;
         }
 
-        return currNode;
+        return currNode ? [i, currNode]: false;
     }
 
     // 向单链表插入元素

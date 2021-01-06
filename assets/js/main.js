@@ -44,6 +44,7 @@ function constructorChange() {
         // =========直接定址法==========
         // 隐藏冲突处理方法
         document.getElementById("collision-area").style["display"] = "none";
+        $('#result-over-area').css('display', 'none')
         // 显示直接定址法的 参数输入框
         document.getElementById("directAddr-value").style["display"] =
             "inline-grid";
@@ -119,13 +120,26 @@ function collisionChange() {
     } else {
         $("#reHash-area").css("display", "none");
     }
+    if('overList' === collision || 'overArr' === collision){
+        $('#result-over-area').css('display', 'block')
+    }else{
+        $('#result-over-area').css('display', 'none')
+    }
 }
 
 // 哈希搜索
-function hashSearch(value) {
+function hashSearch(value = "") {
+    value = $("#search-value")[0].value;
     console.log(value);
-    if (!ht) return;
-    console.log(ht.search(value));
+    if (!ht) {
+        $("#search-result")[0].textContent = "哈希表还未生成(T_T)";
+        return;
+    }
+    let result = ht.search(value)
+    console.log(result);
+    $("#search-result")[0].textContent = result
+        ? "找到！"
+        : "未找到~";
 }
 
 // 生成哈希表
@@ -185,12 +199,12 @@ function genHashTable() {
         data.forEach((element) => {
             ht.push(element);
         });
-        if(ht.over && ht.over.length !== 0)ht.over.sort();
+        // if (ht.over && ht.over.length && ht.over.length !== 0) ht.over.sort();
     }
     console.log(ht.storage);
 
-    document.getElementById("result").innerHTML = ht.toString();
-    console.log(ht.queue.toString())
+    // document.getElementById("result").innerHTML = ht.toString();
+    console.log('显示队列：', ht.queue.toString());
     updateTable();
 }
 
@@ -269,19 +283,88 @@ $('input[id="cell-width"]').bind({
 function updateTable() {
     let q = ht.queue;
     var i = 0;
-    $("#table-cell-animation").html('')
+    $("#table-cell-animation").html("");
     while (!q.isEmpty()) {
         let ele = q.shift().data.split(",");
         let key = ele[0];
         let value = ele[1];
-        if('overArr' === key || 'overList' === key)
-        {
-            console.log('溢出区->', ht.over.toString())
-        }else{
-            setTimeout("updateTableCell(" + key + ", '" + value + "')", 1000 * i++);
+        if ("overList" === key) {
+            // console.log("溢出区->", ht.over.toString());
+            key = "o" + i;
+            setTimeout(function () {
+                if (0 === $("#hashEle_" + key).length) {
+                    // 元素不存在
+                    insertOverTableCell(ele[2], key, value);
+                    // $("#result-table-over").append('<div id="hashEle_' +
+                    // key +
+                    // '" class="cell"><div class="key">' +
+                    // key +
+                    // '</div><div class="value">' +
+                    // value +
+                    // "</div></div>");
+                }
+                updateTableCell(key, value);
+            }, 1000 * i++);
+        }else if("overArr" === key){
+            key = "o" + i;
+            setTimeout(function () {
+                if (0 === $("#hashEle_" + key).length) {
+                    // 元素不存在
+                    $("#result-table-over").append('<div id="hashEle_' +
+                    key +
+                    '" class="cell"><div class="key">' +
+                    key +
+                    '</div><div class="value">' +
+                    value +
+                    "</div></div>");
+                }
+                updateTableCell(key, value);
+            }, 1000 * i++);
+        } else {
+            setTimeout(
+                "updateTableCell('" + key + "', '" + value + "')",
+                1000 * i++
+            );
         }
     }
 }
+
+// 插入元素
+function insertOverTableCell(index, key, value) {
+    if (null === $("#result-table-over")[0].firstElementChild) {
+        $("#result-table-over").append(
+            '<div id="hashEle_' +
+                key +
+                '" class="cell"><div class="key">' +
+                key +
+                '</div><div class="value">' +
+                value +
+                "</div></div>"
+        );
+    } else {
+        $(
+            '<div id="hashEle_' +
+                key +
+                '" class="cell"><div class="key">' +
+                key +
+                '</div><div class="value">' +
+                value +
+                "</div></div>"
+        ).insertAfter("#result-table-over > div:nth-child(" + index + ")");
+    }
+    $("#table-cell-animation").append(
+        "#result-table{--cell-change-color:red;}" +
+            " #hashEle_o" +
+            key +
+            "{" +
+            "   animation: table-cell-display 2s infinite;" +
+            "   animation-iteration-count: 1;" +
+            "   animation-fill-mode: forwards;" +
+            "}"
+    );
+}
+
+// 更新动画和值
 function updateTableCell(key, value) {
     $("#table-cell-animation").append(
         "#result-table{--cell-change-color:red;}" +
