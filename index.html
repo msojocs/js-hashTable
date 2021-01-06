@@ -31,7 +31,8 @@
                     style="width: 100px;" /></span>
         </div>
         <div style="margin-left: 40px;">
-            表元素占比：<input id="cell-width" value="12" type="range" ><input id="cell-width" type="number" max="100" min="0" value="12" onmousewheel/>%
+            表元素占比：<input id="cell-width" value="12" type="range"><input id="cell-width" type="number" max="100" min="0"
+                value="12" onmousewheel />%
         </div>
     </div>
     <br />
@@ -101,10 +102,17 @@
     <!-- 结果表格 -->
     <style id="table-cell-animation"></style>
     <style>
-
         /* Standard syntax */
         @keyframes table-cell-display {
-            50% {background-color:var(--cell-change-color, blue);}
+            50% {
+                background-color: var(--cell-change-color, blue);
+            }
+        }
+        @keyframes table-cell-highlight {
+            
+            50% {
+                background-color: var(--cell-highlight-color, blue);
+            }
         }
     </style>
     <div id="result-table" class="table">
@@ -132,6 +140,23 @@
         getData();
         constructorChange();
         collisionChange();
+        // 表元素占比改变事件
+        $('input[id="cell-width"]').bind({
+            "input propertychange": function (e) {
+                $("#cell-width").html(
+                    "body{--cell-width:" + e.currentTarget.value + "%}"
+                );
+                $('input[id="cell-width"]')[0].value = $(
+                    'input[id="cell-width"]'
+                )[1].value = e.currentTarget.value;
+            },
+        });
+        //哈希搜索绑定回车键
+        $('#search-value').bind('keydown', function (event) {
+            if (event.keyCode == "13") {
+                hashSearch();
+            }
+        });
     </script>
 </body>
 

@@ -155,7 +155,7 @@ class HashTable {
         switch (this.createMethod) {
             case "directAddr":
                 // 直接定址法无冲突，直接返回
-                return this.storage[Hkey];
+                return this.searchDA(Hkey);
             default:
                 break;
         }
@@ -187,6 +187,11 @@ class HashTable {
                 console.log("未识别的冲突处理方法");
                 break;
         }
+    }
+    // 直接定址法搜索
+    searchDA(Hkey) {
+        if (this.storage[Hkey]) return [Hkey, this.storage[Hkey]];
+        else return false;
     }
     // 开放地址法搜索
     searchOA(Hkey, key) {
@@ -223,22 +228,20 @@ class HashTable {
             // 值不匹配
             Hkey = this.CF_reHash(key, d++);
         }
-        if (Hkey) { 
+        if (Hkey) {
             return this.storage[Hkey];
         }
     }
     // 溢出区
-    searchOver(Hkey, key){
-        if(key === this.storage[Hkey])return [Hkey, key, false];
-        if(ht.over instanceof SingleList)
-        {
+    searchOver(Hkey, key) {
+        if (key === this.storage[Hkey]) return [Hkey, key, false];
+        if (ht.over instanceof SingleList) {
             let result = this.over.find(key);
-            if(result)return [result[0], result[1].data];
+            if (result) return [result[0], result[1].data];
             return false;
         }
         let index = this.over.indexOf(key);
-        if(-1 !== index)
-            return [index, key, true];
+        if (-1 !== index) return [index, key, true];
         return false;
     }
 

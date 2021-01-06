@@ -130,16 +130,18 @@ function collisionChange() {
 // 哈希搜索
 function hashSearch(value = "") {
     value = $("#search-value")[0].value;
-    console.log(value);
+    console.log('准备搜索-->', value);
     if (!ht) {
         $("#search-result")[0].textContent = "哈希表还未生成(T_T)";
         return;
     }
+    $("#table-cell-animation").html("");
     let result = ht.search(value)
     console.log(result);
     $("#search-result")[0].textContent = result
         ? "找到！"
         : "未找到~";
+    if(result)highLightTableCell('#hashEle_' + result[0])
 }
 
 // 生成哈希表
@@ -222,6 +224,7 @@ function getConstructor() {
     }
 }
 
+// 取得冲突处理类型
 function getCollision() {
     let c = document.getElementsByName("collision");
     for (var i = 0; i < c.length; i++) {
@@ -232,6 +235,7 @@ function getCollision() {
     }
 }
 
+// 取得数据
 function getData() {
     $.ajax({
         url: "data/isbn.txt",
@@ -270,16 +274,6 @@ function appendTableCell(key, value) {
             "</div></div>"
     );
 }
-$('input[id="cell-width"]').bind({
-    "input propertychange": function (e) {
-        $("#cell-width").html(
-            "body{--cell-width:" + e.currentTarget.value + "%}"
-        );
-        $('input[id="cell-width"]')[0].value = $(
-            'input[id="cell-width"]'
-        )[1].value = e.currentTarget.value;
-    },
-});
 function updateTable() {
     let q = ht.queue;
     var i = 0;
@@ -318,7 +312,7 @@ function updateTable() {
                     value +
                     "</div></div>");
                 }
-                updateTableCell(key, value);
+                updateTableCell(key);
             }, 1000 * i++);
         } else {
             setTimeout(
@@ -365,7 +359,7 @@ function insertOverTableCell(index, key, value) {
 }
 
 // 更新动画和值
-function updateTableCell(key, value) {
+function updateTableCell(key, value = null) {
     $("#table-cell-animation").append(
         "#result-table{--cell-change-color:red;}" +
             " #hashEle_" +
@@ -376,5 +370,16 @@ function updateTableCell(key, value) {
             "   animation-fill-mode: forwards;" +
             "}"
     );
-    $("#hashEle_" + key + " .value")[0].textContent = value;
+    if(value)$("#hashEle_" + key + " .value")[0].textContent = value;
+}
+
+function highLightTableCell(selector) {
+    $("#table-cell-animation").append(
+        "#result-table{--cell-highlight-color:darkorchid;}" +
+        selector +
+            "{" +
+            "   animation: table-cell-highlight 5s infinite;" +
+            "   animation-fill-mode: backwards;" +
+            "}"
+    );
 }
