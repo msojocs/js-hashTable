@@ -26,6 +26,8 @@ class HashTable {
         // 伪随机种子
         this.randSeed = HashTable.seed; // 变化值，产生伪随机序列
         this.exps = [];
+        // 队列
+        this.queue = new SingleList();
     }
 
     // 直接定址法 Hkey = a * key + b

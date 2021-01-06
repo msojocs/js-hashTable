@@ -57,6 +57,14 @@ class SingleList {
         }
     }
 
+    // 删除并返回第一个元素
+    shift(){
+        let currNode = this.head;
+        let node = currNode.next;
+        currNode.next = node.next;
+        return node;
+    }
+
     // 在单链表尾部追加元素
     append(ele){
         let newNode = new ListNode(ele);

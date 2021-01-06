@@ -1,0 +1,50 @@
+<style>
+    @keyframes cart {
+        from {
+            left: 0;
+            top: 0;
+            border-radius: 0;
+        }
+        20% {
+            left: 200px;
+            top: 500px;
+            transform: rotateZ(720deg);
+        }
+        40% {
+            left: 400px;
+            top: 0;
+            border-radius: 50px;
+        }
+        60% {
+            top: 500px;
+            left: 600px;
+            border-radius: 50%;
+        }
+        80% {
+            top: 0px;
+            left: 800px;
+            border-radius: 50px;
+        }
+        to {
+            left: 0;
+            top: 0;
+        }
+    }
+    
+    .Z {
+        height: 150px;
+        width: 150px;
+        position: relative;
+        background-color: blue;
+        animation: cart 10s linear 2s infinite alternate;
+        transition: all 2s;
+    }
+    
+   
+</style>
+</head>
+
+<body>
+<div class="Z">
+
+</div>

@@ -19,21 +19,12 @@ function exampleChange(e) {
             break;
     }
     document.getElementById("data").value = data;
+    updateLength();
 }
 
 // 修改数据
 function dataChange() {
-    let constructor = getConstructor();
-    console.log(constructor);
-    if (
-        "directAddr" === constructor ||
-        $("#length")[0].value <
-            document.getElementById("data").value.split("\n").length
-    ) {
-        $("#length")[0].value = document
-            .getElementById("data")
-            .value.split("\n").length;
-    }
+    updateLength();
 }
 
 // 改变构造方法
@@ -41,10 +32,53 @@ function constructorChange() {
     let constructor = getConstructor();
     console.log(constructor);
     if ("mod" === constructor) {
+        // 显示p输入框
         $("#mod-area").css("display", "block");
     } else {
+        // 隐藏p输入框
         $("#mod-area").css("display", "none");
     }
+    // 初始化数据
+    initData();
+    if ("directAddr" === constructor) {
+        // =========直接定址法==========
+        // 隐藏冲突处理方法
+        document.getElementById("collision-area").style["display"] = "none";
+        // 显示直接定址法的 参数输入框
+        document.getElementById("directAddr-value").style["display"] =
+            "inline-grid";
+        $("#reHash-area").css("display", "none");
+    } else {
+        // 显示冲突处理方法
+        document.getElementById("collision-area").style["display"] = "flex";
+        // 隐藏直接定址法的 参数输入框
+        document.getElementById("directAddr-value").style["display"] = "none";
+        collisionChange();
+    }
+    dataChange();
+}
+
+// 更新表长
+function updateLength() {
+    let data = document.getElementById("data").value;
+    let constructor = getConstructor();
+    if ("directAddr" === constructor || "digitAnalyze" === constructor || "fold" === constructor) {
+        // 更新表长
+        $("#length")[0].value = data.split("\n").length;
+    }else{
+        $("#length")[0].value = data.split(",").length;
+    }
+    // 清空表格
+    $("#result-table").html('');
+    // 添加元素
+    for(var i=0; i < $("#length")[0].value; i++){
+        appendTableCell(i, 'null');
+    }
+}
+
+// 初始化数据
+function initData() {
+    let constructor = getConstructor();
     // 初始化数据：
     switch (constructor) {
         case "directAddr":
@@ -56,6 +90,7 @@ function constructorChange() {
             break;
         case "square":
             document.getElementById("data").value = square;
+            $("#length")[0].value = square.split(",").length + 4;
             break;
         case "fold":
             $("#data")[0].value = isbn;
@@ -66,19 +101,10 @@ function constructorChange() {
         default:
             document.getElementById("data").value =
                 "19, 14, 23, 01, 68, 20, 84, 27, 55, 11, 10, 79";
+            $("#length")[0].value =
+                document.getElementById("data").value.split(",").length + 4;
             break;
     }
-    if ("directAddr" === constructor) {
-        document.getElementById("collision-area").style["display"] = "none";
-        document.getElementById("directAddr-value").style["display"] =
-            "inline-grid";
-        $("#reHash-area").css("display", "none");
-    } else {
-        document.getElementById("collision-area").style["display"] = "flex";
-        document.getElementById("directAddr-value").style["display"] = "none";
-        collisionChange();
-    }
-    dataChange();
 }
 
 // 改变冲突处理方法
@@ -106,7 +132,7 @@ function genHashTable() {
     // console.log(data);
     console.log("constructor->", constructor, "|", "collision->", collision);
 
-    let ht = new HashTable(length, constructor, collision);
+    ht = new HashTable(length, constructor, collision);
 
     let exps = [];
     if ("reHash" === collision) {
@@ -154,6 +180,7 @@ function genHashTable() {
     console.log(ht.storage);
 
     document.getElementById("result").innerHTML = ht.toString();
+
 }
 
 function getReHashExp() {
@@ -206,3 +233,19 @@ function getData() {
         },
     });
 }
+
+function appendTableCell(key, value) {
+    $("#result-table").append(
+        '<div id="hashEle_' + key + '" class="cell"><div class="key">' +
+            key +
+            '</div><div class="value">' +
+            value +
+            "</div></div>"
+    );
+}
+$('input[id="cell-width"]').bind({
+    'input propertychange':function(e){
+        $('#cell-width').html('body{--cell-width:' + e.currentTarget.value + '%}')
+        $('input[id="cell-width"]')[0].value = $('input[id="cell-width"]')[1].value = e.currentTarget.value
+    }
+})

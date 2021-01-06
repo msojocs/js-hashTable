@@ -4,16 +4,19 @@
 <head>
     <title>Hash</title>
     <link href="/assets/css/index.css" rel="stylesheet" />
+    <style id="cell-width">
+
+    </style>
 </head>
 
 <body>
     <div style="display:flex;">
         <textarea id="data" style="height:100px; width:400px" oninput="dataChange()"></textarea>
         <div style="display: flex;flex-direction: column;margin-left: 40px;width: 20%;text-align: right;">
-            <span>表长：<input id="length" type="number" value="16" style="width: 100px;"/></span>
+            <span>表长：<input id="length" type="number" value="16" style="width: 100px;" /></span>
             <div id="directAddr-value" style="display: inline-grid;">
-                <span>a：<input id="a" type="number" value="1" style="width: 100px;"/></span>
-                <span>b：<input id="b" type="number" value="0" style="width: 100px;"/></span>
+                <span>a：<input id="a" type="number" value="1" style="width: 100px;" /></span>
+                <span>b：<input id="b" type="number" value="0" style="width: 100px;" /></span>
                 <span>
                     例子：
                     <select style="width: 100px;" onchange="exampleChange(this.value)">
@@ -22,8 +25,13 @@
                     </select>
                 </span>
             </div>
-            <span id="mod-area">p：<input id="p" type="number" value="13" style="width: 100px;"/></span>
-            <span id="reHash-area" style="display: none;">再哈希函数：<input id="reHashExp" type="text" value="key%13+1,key%13+2,key%13+3,key%13+4,key%13+5,key%13+6,key%13+7,key%13+8,key%13+9,key%13+10,key%13+11" style="width: 100px;"/></span>
+            <span id="mod-area">p：<input id="p" type="number" value="13" style="width: 100px;" /></span>
+            <span id="reHash-area" style="display: none;">再哈希函数：<input id="reHashExp" type="text"
+                    value="key%13+1,key%13+2,key%13+3,key%13+4,key%13+5,key%13+6,key%13+7,key%13+8,key%13+9,key%13+10,key%13+11"
+                    style="width: 100px;" /></span>
+        </div>
+        <div style="margin-left: 40px;">
+            表元素占比：<input id="cell-width" value="12" type="range" ><input id="cell-width" type="number" max="100" min="0" value="12"/>%
         </div>
     </div>
     <br />
@@ -33,19 +41,24 @@
             <span style="text-align: center;">构造方法</span>
             <ul class="select-option" onchange="constructorChange()">
                 <li>
-                    <input id="constructor_directAddr" type="radio" name="constructor" value='directAddr' checked><label for="constructor_directAddr">直接定址法(不会产生冲突)</label>
+                    <input id="constructor_directAddr" type="radio" name="constructor" value='directAddr' checked><label
+                        for="constructor_directAddr">直接定址法(不会产生冲突)</label>
                 </li>
                 <li>
-                    <input id="constructor_digitAnalyze" type="radio" name="constructor" value='digitAnalyze'><label for="constructor_digitAnalyze">数字分析法</label>
+                    <input id="constructor_digitAnalyze" type="radio" name="constructor" value='digitAnalyze'><label
+                        for="constructor_digitAnalyze">数字分析法</label>
                 </li>
                 <li>
-                    <input id="constructor_square" type="radio" name="constructor" value='square'><label for="constructor_square">平方取中法</label>
+                    <input id="constructor_square" type="radio" name="constructor" value='square'><label
+                        for="constructor_square">平方取中法</label>
                 </li>
                 <li>
-                    <input id="constructor_fold" type="radio" name="constructor" value='fold'><label for="constructor_fold">折叠法</label>
+                    <input id="constructor_fold" type="radio" name="constructor" value='fold'><label
+                        for="constructor_fold">折叠法</label>
                 </li>
                 <li>
-                    <input id="constructor_mod" type="radio" name="constructor" value='mod'><label for="constructor_mod">除留取余法</label>
+                    <input id="constructor_mod" type="radio" name="constructor" value='mod'><label
+                        for="constructor_mod">除留取余法</label>
                 </li>
             </ul>
         </div>
@@ -53,25 +66,32 @@
             <span style="text-align: center;">冲突处理方法</span>
             <ul class="select-option" onchange="collisionChange()">
                 <li>
-                    <input id="collision_OALine" type="radio" name="collision" value="OALine" checked><label for="collision_OALine" >开放定址法(线性探测再散列)</label>
+                    <input id="collision_OALine" type="radio" name="collision" value="OALine" checked><label
+                        for="collision_OALine">开放定址法(线性探测再散列)</label>
                 </li>
                 <li>
-                    <input id="collision_OASecond" type="radio" name="collision" value="OASecond" ><label for="collision_OASecond" >开放定址法(二次探测再散列)</label>
+                    <input id="collision_OASecond" type="radio" name="collision" value="OASecond"><label
+                        for="collision_OASecond">开放定址法(二次探测再散列)</label>
                 </li>
                 <li>
-                    <input id="collision_OARand" type="radio" name="collision" value="OARand" ><label for="collision_OARand" >开放定址法(伪随机序列)</label>
+                    <input id="collision_OARand" type="radio" name="collision" value="OARand"><label
+                        for="collision_OARand">开放定址法(伪随机序列)</label>
                 </li>
                 <li>
-                    <input id="collision_reHash" type="radio" name="collision" value="reHash"><label for="collision_reHash" >再哈希法</label>
+                    <input id="collision_reHash" type="radio" name="collision" value="reHash"><label
+                        for="collision_reHash">再哈希法</label>
                 </li>
                 <li>
-                    <input id="collision_ListAddr" type="radio" name="collision" value="ListAddr" ><label for="collision_ListAddr" >链地址法</label>
+                    <input id="collision_ListAddr" type="radio" name="collision" value="ListAddr"><label
+                        for="collision_ListAddr">链地址法</label>
                 </li>
                 <li>
-                    <input id="collision_overArr" type="radio" name="collision" value="overArr" ><label for="collision_overArr" >溢出区法(顺序)</label>
+                    <input id="collision_overArr" type="radio" name="collision" value="overArr"><label
+                        for="collision_overArr">溢出区法(顺序)</label>
                 </li>
                 <li>
-                    <input id="collision_overList" type="radio" name="collision" value="overList" ><label for="collision_overList" >溢出区法(链式)</label>
+                    <input id="collision_overList" type="radio" name="collision" value="overList"><label
+                        for="collision_overList">溢出区法(链式)</label>
                 </li>
             </ul>
         </div>
@@ -79,7 +99,26 @@
     </div>
     <p id="result" style="word-break:break-all;"></p>
     <!-- 结果表格 -->
-    <div>
+    <style>
+        #test{
+            --c: red;
+        }
+        #test{
+            animation: mymove 5s infinite;
+            animation-iteration-count: 1;
+            animation-fill-mode: forwards;
+        }
+
+        /* Standard syntax */
+        @keyframes mymove {
+            50% {background-color:var(--c, blue);}
+        }
+    </style>
+    <div id="result-table" class="table">
+        <div id="test" class="cell">
+            <div class="key">11</div>
+            <div class="value">value11</div>
+        </div>
     </div>
     <!-- 结果表格END -->
     <div>
@@ -93,7 +132,7 @@
     <script src="./assets/js/hash.js"></script>
     <script src="./assets/js/main.js"></script>
     <script>
-        var isbn, square, student;
+        var isbn, square, student, ht;
         // 初始化
         getData();
         constructorChange();
