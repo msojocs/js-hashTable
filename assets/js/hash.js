@@ -18,7 +18,7 @@ class HashTable {
         // 冲突处理方法
         this.collisionMethod = collision;
         // 除留取余法
-        this.p = 13
+        this.p = 13;
         // 溢出区
         this.over = null;
         // 直接定址法 Hkey = a * key + b
@@ -38,11 +38,11 @@ class HashTable {
     setReHashExp(exps) {
         this.exps = exps;
     }
-    setP(p){
-        this.p = p
+    setP(p) {
+        this.p = p;
     }
     // 重置伪随机种子
-    resetRandSeed(){
+    resetRandSeed() {
         this.randSeed = HashTable.seed;
     }
 
@@ -121,7 +121,10 @@ class HashTable {
             // 被占用
             Hkey = this.CF_reHash(key, d++);
         }
-        if (Hkey) this.storage[Hkey] = value;
+        if (Hkey) {
+            this.storage[Hkey] = value;
+            this.queue.append(Hkey + "," + value);
+        }
     }
     // 开放地址填入元素
     pushOA(Hkey, key, value = key) {
@@ -136,26 +139,102 @@ class HashTable {
             // throw new Error("");
         }
         this.storage[Hkey] = value;
+        this.queue.append(Hkey + "," + value);
     }
 
     // 直接定址法填入元素
     pushDA(Hkey, value) {
         this.storage[Hkey] = value;
+        this.queue.append(Hkey + "," + value);
     }
 
     // 搜索
-    searchOA(value) {
+    search(key) {
+        let Hkey = this.hashFunc(key);
+        // console.log('Hkey-->', Hkey);
+        switch (this.createMethod) {
+            case "directAddr":
+                // 直接定址法无冲突，直接返回
+                return this.storage[Hkey];
+            default:
+                break;
+        }
+
+        switch (this.collisionMethod) {
+            // 开放定址法
+            case "OALine":
+            case "OASecond":
+                return this.searchOA(Hkey, key);
+                break;
+            case "OARand":
+                this.resetRandSeed();
+                return this.searchOA(Hkey, key);
+                break;
+            // 链地址
+            case "ListAddr":
+                return this.searchListAddr(Hkey, key);
+                break;
+            // 再哈希
+            case "reHash":
+                return this.searchReHash(Hkey, key);
+                break;
+            // 溢出区
+            case "overArr":
+            case "overList":
+                return this.searchOver(Hkey, key);
+                break;
+            default:
+                console.log("未识别的冲突处理方法");
+                break;
+        }
+    }
+    // 开放地址法搜索
+    searchOA(Hkey, key) {
         // 算哈希地址
-        let Hkey = this.hashFunc(value);
         let d = 1;
         console.log("Hkey", Hkey);
-        while (value !== this.storage[Hkey]) {
+        while (key != this.storage[Hkey]) {
             // Hkey地址元素不正确
-            Hkey = this.collisionOA(value, d++);
+            Hkey = this.collisionOA(key, d++);
+            console.log("New Hkey->", Hkey);
             if (undefined === this.storage[Hkey] || null === this.storage[Hkey])
                 return false;
         }
         return [Hkey, this.storage[Hkey]];
+    }
+    // 链地址法搜索
+    searchListAddr(Hkey, key) {
+        let currNode = this.storage[Hkey];
+        if (!currNode) return false;
+        currNode = currNode.head;
+        var i = 0;
+        while (currNode && key !== currNode.data) {
+            i++;
+            currNode = currNode.next;
+        }
+        if (currNode) {
+            return [Hkey, i, key];
+        } else return false;
+    }
+    // 再哈希
+    searchReHash(Hkey, key) {
+        let d = 0;
+        while (Hkey && key !== this.storage[Hkey]) {
+            // 值不匹配
+            Hkey = this.CF_reHash(key, d++);
+        }
+        if (Hkey) { 
+            return this.storage[Hkey];
+        }
+    }
+    // 溢出区
+    searchOver(Hkey, key){
+        if(key === this.storage[Hkey])return true;
+        if(ht.over instanceof SingleList)
+        {
+            return null !== this.over.find(key);
+        }else
+        return -1 !== this.over.indexOf(key);
     }
 
     // ==============构造=============
@@ -173,22 +252,22 @@ class HashTable {
     }
 
     // 平方取中法（BASIC标识符）
-    HF_square(key){
+    HF_square(key) {
         var dict = {};
-        for(var i=0; i < 26; i++){
+        for (var i = 0; i < 26; i++) {
             dict[String.fromCharCode(65 + i)] = (i + 1).toString(8);
         }
-        for(var i=0; i < 9; i++){
+        for (var i = 0; i < 9; i++) {
             dict[i] = (i + 48).toString(8);
         }
-        key = key.split("")
-        key.forEach((ele, i)=>{
-            key[i] = dict[ele]
-        })
-        if(key.length == 1)key.push('00')
+        key = key.split("");
+        key.forEach((ele, i) => {
+            key[i] = dict[ele];
+        });
+        if (key.length == 1) key.push("00");
         key = parseInt(key.join(""));
         key = Math.pow(parseInt(key, 8), 2).toString(8);
-        key = key.substring(0, key.length - 3).substr(-3)
+        key = key.substring(0, key.length - 3).substr(-3);
         // throw new Error("")
         return key;
     }
@@ -199,7 +278,7 @@ class HashTable {
         console.log(key);
         // 模式： 0 普通型 | 1 S型
         let mode = 1;
-        let d = this.length.toString().length
+        let d = this.length.toString().length;
         let part = [];
         while (key) {
             part.push(key.substr(-d));
@@ -292,15 +371,20 @@ class HashTable {
                 currNode = currNode.next;
             }
             this.storage[Hkey].insert(currNode.data, key);
+            this.queue.append(Hkey + "," + key);
         }
     }
 
     // 公共溢出区
     pushOverArr(Hkey, value) {
         if (this.over === null) this.over = [];
-        if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey])
+        if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
             this.over.push(value);
-        else this.storage[Hkey] = value;
+            this.queue.append("overArr," + value);
+        } else {
+            this.storage[Hkey] = value;
+            this.queue.append(Hkey + "," + value);
+        }
     }
     pushOverList(Hkey, value) {
         if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
@@ -314,8 +398,12 @@ class HashTable {
                     currNode = currNode.next;
                 }
                 this.over.insert(currNode.data, value);
+                this.queue.append("overList," + value);
             }
-        } else this.storage[Hkey] = value;
+        } else {
+            this.storage[Hkey] = value;
+            this.queue.append(Hkey + "," + value);
+        }
     }
 }
 

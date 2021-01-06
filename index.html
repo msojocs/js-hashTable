@@ -31,7 +31,7 @@
                     style="width: 100px;" /></span>
         </div>
         <div style="margin-left: 40px;">
-            表元素占比：<input id="cell-width" value="12" type="range" ><input id="cell-width" type="number" max="100" min="0" value="12"/>%
+            表元素占比：<input id="cell-width" value="12" type="range" ><input id="cell-width" type="number" max="100" min="0" value="12" onmousewheel/>%
         </div>
     </div>
     <br />
@@ -99,26 +99,15 @@
     </div>
     <p id="result" style="word-break:break-all;"></p>
     <!-- 结果表格 -->
+    <style id="table-cell-animation"></style>
     <style>
-        #test{
-            --c: red;
-        }
-        #test{
-            animation: mymove 5s infinite;
-            animation-iteration-count: 1;
-            animation-fill-mode: forwards;
-        }
 
         /* Standard syntax */
-        @keyframes mymove {
-            50% {background-color:var(--c, blue);}
+        @keyframes table-cell-display {
+            50% {background-color:var(--cell-change-color, blue);}
         }
     </style>
     <div id="result-table" class="table">
-        <div id="test" class="cell">
-            <div class="key">11</div>
-            <div class="value">value11</div>
-        </div>
     </div>
     <!-- 结果表格END -->
     <div>

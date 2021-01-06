@@ -62,17 +62,21 @@ function constructorChange() {
 function updateLength() {
     let data = document.getElementById("data").value;
     let constructor = getConstructor();
-    if ("directAddr" === constructor || "digitAnalyze" === constructor || "fold" === constructor) {
+    if (
+        "directAddr" === constructor ||
+        "digitAnalyze" === constructor ||
+        "fold" === constructor
+    ) {
         // 更新表长
-        $("#length")[0].value = data.split("\n").length;
-    }else{
-        $("#length")[0].value = data.split(",").length;
+        $("#length")[0].value = data.split("\n").length + 1;
+    } else {
+        $("#length")[0].value = data.split(",").length + 1;
     }
     // 清空表格
-    $("#result-table").html('');
+    $("#result-table").html("");
     // 添加元素
-    for(var i=0; i < $("#length")[0].value; i++){
-        appendTableCell(i, 'null');
+    for (var i = 0; i < $("#length")[0].value; i++) {
+        appendTableCell(i, "null");
     }
 }
 
@@ -100,7 +104,7 @@ function initData() {
             break;
         default:
             document.getElementById("data").value =
-                "19, 14, 23, 01, 68, 20, 84, 27, 55, 11, 10, 79";
+                "19,14,23,01,68,20,84,27,55,11,10,79";
             $("#length")[0].value =
                 document.getElementById("data").value.split(",").length + 4;
             break;
@@ -120,6 +124,8 @@ function collisionChange() {
 // 哈希搜索
 function hashSearch(value) {
     console.log(value);
+    if (!ht) return;
+    console.log(ht.search(value));
 }
 
 // 生成哈希表
@@ -143,6 +149,7 @@ function genHashTable() {
         ht.setP($("#p")[0].value);
     }
     if ("directAddr" === constructor) {
+        // 直接定址法
         let a = parseInt(document.getElementById("a").value);
         let b = parseInt(document.getElementById("b").value);
         ht.setAB(a, b);
@@ -160,12 +167,14 @@ function genHashTable() {
             }
         });
     } else if ("fold" === constructor) {
+        // 折叠法
         data = data.split(/\n/);
         console.log(data);
         data.forEach((ele) => {
             ht.push(ele);
         });
     } else if ("digitAnalyze" === constructor) {
+        // 数字分析法
         data = data.split(/\n/);
         data.forEach((ele) => {
             ht.push(ele);
@@ -176,11 +185,13 @@ function genHashTable() {
         data.forEach((element) => {
             ht.push(element);
         });
+        if(ht.over && ht.over.length !== 0)ht.over.sort();
     }
     console.log(ht.storage);
 
     document.getElementById("result").innerHTML = ht.toString();
-
+    console.log(ht.queue.toString())
+    updateTable();
 }
 
 function getReHashExp() {
@@ -236,7 +247,9 @@ function getData() {
 
 function appendTableCell(key, value) {
     $("#result-table").append(
-        '<div id="hashEle_' + key + '" class="cell"><div class="key">' +
+        '<div id="hashEle_' +
+            key +
+            '" class="cell"><div class="key">' +
             key +
             '</div><div class="value">' +
             value +
@@ -244,8 +257,41 @@ function appendTableCell(key, value) {
     );
 }
 $('input[id="cell-width"]').bind({
-    'input propertychange':function(e){
-        $('#cell-width').html('body{--cell-width:' + e.currentTarget.value + '%}')
-        $('input[id="cell-width"]')[0].value = $('input[id="cell-width"]')[1].value = e.currentTarget.value
+    "input propertychange": function (e) {
+        $("#cell-width").html(
+            "body{--cell-width:" + e.currentTarget.value + "%}"
+        );
+        $('input[id="cell-width"]')[0].value = $(
+            'input[id="cell-width"]'
+        )[1].value = e.currentTarget.value;
+    },
+});
+function updateTable() {
+    let q = ht.queue;
+    var i = 0;
+    $("#table-cell-animation").html('')
+    while (!q.isEmpty()) {
+        let ele = q.shift().data.split(",");
+        let key = ele[0];
+        let value = ele[1];
+        if('overArr' === key || 'overList' === key)
+        {
+            console.log('溢出区->', ht.over.toString())
+        }else{
+            setTimeout("updateTableCell(" + key + ", '" + value + "')", 1000 * i++);
+        }
     }
-})
+}
+function updateTableCell(key, value) {
+    $("#table-cell-animation").append(
+        "#result-table{--cell-change-color:red;}" +
+            " #hashEle_" +
+            key +
+            "{" +
+            "   animation: table-cell-display 2s infinite;" +
+            "   animation-iteration-count: 1;" +
+            "   animation-fill-mode: forwards;" +
+            "}"
+    );
+    $("#hashEle_" + key + " .value")[0].textContent = value;
+}

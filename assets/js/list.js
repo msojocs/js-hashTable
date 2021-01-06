@@ -62,6 +62,7 @@ class SingleList {
         let currNode = this.head;
         let node = currNode.next;
         currNode.next = node.next;
+        this.size--;
         return node;
     }
 
