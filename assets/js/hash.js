@@ -159,9 +159,7 @@ class HashTable {
     // ==============构造=============
     // 直接定址法
     HF_directAddr(key) {
-        let a = 1,
-            b = 0;
-        let Hkey = a * key + b;
+        let Hkey = this.a * key + this.b;
         return Hkey;
     }
 
