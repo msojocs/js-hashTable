@@ -141,6 +141,9 @@ function hashSearch(value = "") {
     $("#search-result")[0].textContent = result
         ? "找到！"
         : "未找到~";
+    if(result && result[2] && result[2] === true){
+        highLightTableCell('#result-table-over > div:nth-child(' + (result[0] + 1) + ')')
+    }else
     if(result)highLightTableCell('#hashEle_' + result[0])
 }
 
