@@ -9,7 +9,7 @@
 <body>
     <div style="display:flex;">
         <textarea id="data" style="height:100px; width:400px" oninput="dataChange()"></textarea>
-        <div style="display: flex;flex-direction: column;margin-left: 20px;text-align: right;">
+        <div style="display: flex;flex-direction: column;margin-left: 40px;width: 20%;text-align: right;">
             <span>表长：<input id="length" type="number" value="16" style="width: 100px;"/></span>
             <div id="directAddr-value" style="display: inline-grid;">
                 <span>a：<input id="a" type="number" value="1" style="width: 100px;"/></span>
@@ -33,19 +33,19 @@
             <span style="text-align: center;">构造方法</span>
             <ul class="select-option" onchange="constructorChange()">
                 <li>
-                    <input type="radio" name="constructor" value='directAddr' checked>直接定址法(不会产生冲突)
+                    <input id="constructor_directAddr" type="radio" name="constructor" value='directAddr' checked><label for="constructor_directAddr">直接定址法(不会产生冲突)</label>
                 </li>
                 <li>
-                    <input type="radio" name="constructor" value='digitAnalyze'>数字分析法
+                    <input id="constructor_digitAnalyze" type="radio" name="constructor" value='digitAnalyze'><label for="constructor_digitAnalyze">数字分析法</label>
                 </li>
                 <li>
-                    <input type="radio" name="constructor" value='square'>平方取中法
+                    <input id="constructor_square" type="radio" name="constructor" value='square'><label for="constructor_square">平方取中法</label>
                 </li>
                 <li>
-                    <input type="radio" name="constructor" value='fold'>折叠法
+                    <input id="constructor_fold" type="radio" name="constructor" value='fold'><label for="constructor_fold">折叠法</label>
                 </li>
                 <li>
-                    <input type="radio" name="constructor" value='mod'>除留取余法
+                    <input id="constructor_mod" type="radio" name="constructor" value='mod'><label for="constructor_mod">除留取余法</label>
                 </li>
             </ul>
         </div>
@@ -53,31 +53,35 @@
             <span style="text-align: center;">冲突处理方法</span>
             <ul class="select-option" onchange="collisionChange()">
                 <li>
-                    <input type="radio" name="collision" value="OALine" checked>开放定址法(线性探测再散列)
+                    <input id="collision_OALine" type="radio" name="collision" value="OALine" checked><label for="collision_OALine" >开放定址法(线性探测再散列)</label>
                 </li>
                 <li>
-                    <input type="radio" name="collision" value="OASecond" >开放定址法(二次探测再散列)
+                    <input id="collision_OASecond" type="radio" name="collision" value="OASecond" ><label for="collision_OASecond" >开放定址法(二次探测再散列)</label>
                 </li>
                 <li>
-                    <input type="radio" name="collision" value="OARand" >开放定址法(伪随机序列)
+                    <input id="collision_OARand" type="radio" name="collision" value="OARand" ><label for="collision_OARand" >开放定址法(伪随机序列)</label>
                 </li>
                 <li>
-                    <input type="radio" name="collision" value="reHash">再哈希法
+                    <input id="collision_reHash" type="radio" name="collision" value="reHash"><label for="collision_reHash" >再哈希法</label>
                 </li>
                 <li>
-                    <input type="radio" name="collision" value="ListAddr" >链地址法
+                    <input id="collision_ListAddr" type="radio" name="collision" value="ListAddr" ><label for="collision_ListAddr" >链地址法</label>
                 </li>
                 <li>
-                    <input type="radio" name="collision" value="overArr" >溢出区法(顺序)
+                    <input id="collision_overArr" type="radio" name="collision" value="overArr" ><label for="collision_overArr" >溢出区法(顺序)</label>
                 </li>
                 <li>
-                    <input type="radio" name="collision" value="overList" >溢出区法(链式)
+                    <input id="collision_overList" type="radio" name="collision" value="overList" ><label for="collision_overList" >溢出区法(链式)</label>
                 </li>
             </ul>
         </div>
         <button onclick="genHashTable()">生成哈希表</button>
     </div>
     <p id="result" style="word-break:break-all;"></p>
+    <!-- 结果表格 -->
+    <div>
+    </div>
+    <!-- 结果表格END -->
     <div>
         <h2>搜索:</h2>
         <input value="" oninput="hashSearch(this.value)" />

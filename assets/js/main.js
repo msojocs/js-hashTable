@@ -1,3 +1,4 @@
+// 改变例子
 function exampleChange(e) {
     console.log(e);
     let data = "";
@@ -6,6 +7,7 @@ function exampleChange(e) {
             for (var i = 1; i <= 100; i++) {
                 data += i + "," + i * 100 + "\n";
             }
+            document.getElementById("b").value = 0;
             break;
         case "directAddr_example2":
             for (var i = 1949; i < new Date().getFullYear(); i++) {
@@ -18,6 +20,8 @@ function exampleChange(e) {
     }
     document.getElementById("data").value = data;
 }
+
+// 修改数据
 function dataChange() {
     let constructor = getConstructor();
     console.log(constructor);
@@ -31,6 +35,8 @@ function dataChange() {
             .value.split("\n").length;
     }
 }
+
+// 改变构造方法
 function constructorChange() {
     let constructor = getConstructor();
     console.log(constructor);
@@ -74,6 +80,8 @@ function constructorChange() {
     }
     dataChange();
 }
+
+// 改变冲突处理方法
 function collisionChange() {
     let collision = getCollision();
     if ("reHash" === collision) {
@@ -83,9 +91,12 @@ function collisionChange() {
     }
 }
 
+// 哈希搜索
 function hashSearch(value) {
     console.log(value);
 }
+
+// 生成哈希表
 function genHashTable() {
     let constructor = getConstructor();
     let collision = getCollision();
