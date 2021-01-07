@@ -157,8 +157,12 @@ function genHashTable() {
     // console.log(data);
     console.log("constructor->", constructor, "|", "collision->", collision);
 
+    try{
     ht = new HashTable(length, constructor, collision);
-
+    }catch(e){
+        alert(e)
+    }
+    
     let exps = [];
     if ("reHash" === collision) {
         exps = getReHashExp();
@@ -371,6 +375,9 @@ function updateTableCell(key, value = null) {
             "   animation: table-cell-display 2s infinite;" +
             "   animation-iteration-count: 1;" +
             "   animation-fill-mode: forwards;" +
+            "   -webkit-animation: table-cell-display 2s infinite;" +
+            "   -webkit-animation-iteration-count: 1;" +
+            "   -webkit-animation-fill-mode: forwards;" +
             "}"
     );
     if(value)$("#hashEle_" + key + " .value")[0].textContent = value;
@@ -383,6 +390,8 @@ function highLightTableCell(selector) {
             "{" +
             "   animation: table-cell-highlight 5s infinite;" +
             "   animation-fill-mode: backwards;" +
+            "   -webkit-animation: table-cell-highlight 5s infinite;" +
+            "   -webkit-animation-fill-mode: backwards;" +
             "}"
     );
 }

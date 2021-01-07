@@ -114,6 +114,18 @@
                 background-color: var(--cell-highlight-color, blue);
             }
         }
+        /*Safari 和 Chrome:*/
+        @-webkit-keyframes table-cell-display {
+            50% {
+                background-color: var(--cell-change-color, blue);
+            }
+        }
+        @-webkit-keyframes table-cell-highlight {
+            
+            50% {
+                background-color: var(--cell-highlight-color, blue);
+            }
+        }
     </style>
     <div id="result-table" class="table">
     </div>
@@ -129,12 +141,22 @@
         <p>搜索情况：<span id="search-result"></span></p>
     </div>
     <div></div>
-    <script src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
-    <script src="./assets/js/list.js"></script>
-    <script src="./assets/js/stack.js"></script>
-    <script src="./assets/js/hash.js"></script>
-    <script src="./assets/js/main.js"></script>
     <script>
+        // onerror = function(msg, url, row,col) {
+        //     var txt = '';
+        //     txt += 'ERROR in ' + url + '\n';
+        //     txt += '✘' + msg + '   in line ' + row + ':' + col;
+        //     txt += '';
+        //     alert(txt);
+        //     return true;  //加上这句控制台就不会报错
+        // }
+    </script>
+    <script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="assets/js/list.js"></script>
+    <script type="text/javascript" src="assets/js/stack.js"></script>
+    <script type="text/javascript" src="assets/js/hashTable.js"></script>
+    <script type="text/javascript" src="assets/js/main.js"></script>
+    <script type="text/javascript">
         var isbn, square, student, ht;
         // 初始化
         getData();

@@ -1,5 +1,5 @@
+const seed = new Date().getTime(); // 当次运行时为定值，用于伪随机搜索
 class HashTable {
-    static seed = new Date().getTime(); // 当次运行时为定值，用于伪随机搜索
 
     constructor(
         length = 11,
@@ -43,7 +43,7 @@ class HashTable {
     }
     // 重置伪随机种子
     resetRandSeed() {
-        this.randSeed = HashTable.seed;
+        this.randSeed = seed;
     }
 
     toString() {
