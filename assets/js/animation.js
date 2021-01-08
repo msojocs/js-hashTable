@@ -1,3 +1,68 @@
+
+// 效果
+function tableAnimation() {
+    let q = ht.queue; // 动画队列
+    var queue = Promise.resolve();
+    var i = 0;
+    $("#table-cell-animation").html("");
+    while (!q.isEmpty()) {
+        let ele = q.shift().data.split(",");
+        let key = ele[0];
+        let value = ele[1];
+        if ("overList" === key) {
+            // console.log("溢出区->", ht.over.toString());
+            key = "o" + i++;
+            queue = queue.then(() => {
+                return promiseFactory(function () {
+                    if (0 === $("#hashEle_" + key).length) {
+                        // 元素不存在
+                        insertOverTableCell(ele[2], key, value);
+                    }
+                    updateTableCell(key, value);
+                });
+            });
+        } else if ("overArr" === key) {
+            key = "o" + i++;
+            queue = queue.then(() => {
+                return promiseFactory(function () {
+                    if (0 === $("#hashEle_" + key).length) {
+                        // 元素不存在
+                        $("#result-table-over").append(
+                            '<div id="list_' +
+                                key +
+                                '" class="list"><div id="hashEle_' +
+                                key +
+                                '" class="cell"><div class="key">' +
+                                key +
+                                '</div><div class="value">' +
+                                value +
+                                "</div></div></div>"
+                        );
+                    }
+                    updateTableCell(key);
+                });
+            });
+        } else if ("listAddr" === key) {
+            queue = queue.then(() => {
+                return promiseFactory(function () {
+                    listAddr_addNode(parseInt(ele[1]), ele[2], ele[3]);
+                });
+            });
+        }else {
+            queue = queue.then(() => {
+                return promiseFactory(() => {
+                    updateTableCell(key, value);
+                });
+            });
+        }
+    }
+    queue = queue.then(() => {
+        return promiseFactory(() => {
+            $("#table-cell-animation").html("");
+        });
+    });
+}
+
 // 更新动画和值
 function updateTableCell(key, value = null) {
     $("#table-cell-animation").append(
@@ -64,70 +129,6 @@ function listAddr_addNode(index = 0, pos = 1, value = ""){
     updateTableCell('l' + index)
 }
 
-// 效果
-function tableAnimation() {
-    let q = ht.queue; // 动画队列
-    var queue = Promise.resolve();
-    var i = 0;
-    $("#table-cell-animation").html("");
-    while (!q.isEmpty()) {
-        let ele = q.shift().data.split(",");
-        let key = ele[0];
-        let value = ele[1];
-        if ("overList" === key) {
-            // console.log("溢出区->", ht.over.toString());
-            key = "o" + i++;
-            queue = queue.then(() => {
-                return promiseFactory(function () {
-                    if (0 === $("#hashEle_" + key).length) {
-                        // 元素不存在
-                        insertOverTableCell(ele[2], key, value);
-                    }
-                    updateTableCell(key, value);
-                });
-            });
-        } else if ("overArr" === key) {
-            key = "o" + i++;
-            queue = queue.then(() => {
-                return promiseFactory(function () {
-                    if (0 === $("#hashEle_" + key).length) {
-                        // 元素不存在
-                        $("#result-table-over").append(
-                            '<div id="list_' +
-                                key +
-                                '" class="list"><div id="hashEle_' +
-                                key +
-                                '" class="cell"><div class="key">' +
-                                key +
-                                '</div><div class="value">' +
-                                value +
-                                "</div></div></div>"
-                        );
-                    }
-                    updateTableCell(key);
-                });
-            });
-        } else if ("listAddr" === key) {
-            queue = queue.then(() => {
-                return promiseFactory(function () {
-                    listAddr_addNode(parseInt(ele[1]), ele[2], ele[3]);
-                });
-            });
-        }else {
-            queue = queue.then(() => {
-                return promiseFactory(() => {
-                    updateTableCell(key, value);
-                });
-            });
-        }
-    }
-    queue = queue.then(() => {
-        return promiseFactory(() => {
-            $("#table-cell-animation").html("");
-        });
-    });
-}
-
 // 插入元素
 function insertOverTableCell(index, key, value) {
     if (null === $("#result-table-over")[0].firstElementChild) {
@@ -165,4 +166,26 @@ function insertOverTableCell(index, key, value) {
             "   animation-fill-mode: forwards;" +
             "}"
     );
+}
+
+function appendTableCell(key, value) {
+    $("#result-table").append(
+        '<div id="list_' +
+            key +
+            '" class="list"><div id="hashEle_' +
+            key +
+            '" class="cell"><div class="key">' +
+            key +
+            '</div><div class="value">' +
+            value +
+            "</div></div></div>"
+    );
+}
+function promiseFactory(r) {
+    return new Promise((resolve, reject) => {
+        r();
+        setTimeout(() => {
+            resolve();
+        }, 2000);
+    });
 }

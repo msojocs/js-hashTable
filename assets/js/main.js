@@ -285,25 +285,3 @@ function getData() {
         },
     });
 }
-
-function appendTableCell(key, value) {
-    $("#result-table").append(
-        '<div id="list_' +
-            key +
-            '" class="list"><div id="hashEle_' +
-            key +
-            '" class="cell"><div class="key">' +
-            key +
-            '</div><div class="value">' +
-            value +
-            "</div></div></div>"
-    );
-}
-function promiseFactory(r) {
-    return new Promise((resolve, reject) => {
-        r();
-        setTimeout(() => {
-            resolve();
-        }, 2000);
-    });
-}
