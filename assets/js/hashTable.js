@@ -237,7 +237,7 @@ class HashTable {
         if (key === this.storage[Hkey]) return [Hkey, key, false];
         if (ht.over instanceof SingleList) {
             let result = this.over.find(key);
-            if (result) return [result[0], result[1].data];
+            if (result) return [result[0] - 1, result[1].data, true];
             return false;
         }
         let index = this.over.indexOf(key);
@@ -368,7 +368,7 @@ class HashTable {
 
     // 链地址法
     pushListAddr(Hkey, key) {
-        // console.log('hkey', Hkey)
+        var pos = 1;
         if (null === this.storage[Hkey]) {
             this.storage[Hkey] = new SingleList();
             this.storage[Hkey].append(key);
@@ -376,11 +376,12 @@ class HashTable {
             // 有序插入
             let currNode = this.storage[Hkey].head;
             while (currNode.next && currNode.next.data < key) {
+                pos++;
                 currNode = currNode.next;
             }
             this.storage[Hkey].insert(currNode.data, key);
-            this.queue.append(Hkey + "," + key);
         }
+        this.queue.append("listAddr," + Hkey + "," + pos + "," + key);
     }
 
     // 公共溢出区
@@ -411,6 +412,7 @@ class HashTable {
                     i++;
                     currNode = currNode.next;
                 }
+                console.log(Hkey, value)
                 this.over.insert(currNode.data, value);
                 this.queue.append("overList," + value + "," + i);
             }

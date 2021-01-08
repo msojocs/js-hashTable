@@ -38,15 +38,19 @@
     flex-wrap: wrap;
     margin: 0.5rem;
 }
-.table > .cell > .key {
+.table .cell .key {
     border-bottom: rgb(150, 138, 138) solid 1px;
 }
-.table > .cell {
+.table .cell {
     border-radius: 8px;
     background-color: peru;
-    width: var(--cell-width, 12%);
+    width: 100%;
     text-align: center;
     margin: 0.1rem;
+}
+.table .list{
+    margin: 0.1rem;
+    width: var(--cell-width, 12vw);
 }
 
 /* search */

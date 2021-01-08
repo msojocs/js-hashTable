@@ -75,11 +75,19 @@ function updateLength(length = null) {
             length = $("#length")[0].value = data.split(",").length + 1;
         }
     }
-    // 清空表格
-    $("#result-table").html("");
-    // 添加元素
-    for (var i = 0; i < length; i++) {
-        appendTableCell(i, "null");
+    // 表格元素个数
+    let num = $("#result-table > .list").length;
+    if (num < length) {
+        // 元素个数小于设定长度
+        for (var i = num; i < length; i++) {
+            appendTableCell(i, "null");
+        }
+    } else {
+        // 元素个数大于设定长度
+        // 删除元素
+        for (var i = num; i > length; i--) {
+            $("#result-table > div:nth-child(" + i + ")").remove();
+        }
     }
 }
 
@@ -122,6 +130,12 @@ function collisionChange() {
     } else {
         $("#reHash-area").css("display", "none");
     }
+    if("ListAddr" === collision)
+    {
+        listAddrModeSwitch(true)
+    }else{
+        listAddrModeSwitch()
+    }
     if ("overList" === collision || "overArr" === collision) {
         $("#result-over-area").css("display", "block");
     } else {
@@ -142,8 +156,9 @@ function hashSearch(value = "") {
     console.log(result);
     $("#search-result")[0].textContent = result ? "找到！" : "未找到~";
     if (result && result[2] && result[2] === true) {
+        // 溢出区
         highLightTableCell(
-            "#result-table-over > div:nth-child(" + (result[0] + 1) + ")"
+            "#result-table-over > div:nth-child(" + (result[0] + 1) + ") > .cell"
         );
     } else if (result) highLightTableCell("#hashEle_" + result[0]);
 }
@@ -215,7 +230,7 @@ function genHashTable() {
 
     // document.getElementById("result").innerHTML = ht.toString();
     console.log("显示队列：", ht.queue.toString());
-    updateTable();
+    tableAnimation();
 }
 
 function getReHashExp() {
@@ -273,17 +288,28 @@ function getData() {
 
 function appendTableCell(key, value) {
     $("#result-table").append(
-        '<div id="hashEle_' +
+        '<div id="list_' +
+            key +
+            '" class="list"><div id="hashEle_' +
             key +
             '" class="cell"><div class="key">' +
             key +
             '</div><div class="value">' +
             value +
-            "</div></div>"
+            "</div></div></div>"
     );
 }
-function updateTable() {
-    let q = ht.queue;   // 动画队列
+function promiseFactory(r) {
+    return new Promise((resolve, reject) => {
+        r();
+        setTimeout(() => {
+            resolve();
+        }, 2000);
+    });
+}
+function tableAnimation() {
+    let q = ht.queue; // 动画队列
+    var queue = Promise.resolve();
     var i = 0;
     $("#table-cell-animation").html("");
     while (!q.isEmpty()) {
@@ -292,68 +318,83 @@ function updateTable() {
         let value = ele[1];
         if ("overList" === key) {
             // console.log("溢出区->", ht.over.toString());
-            key = "o" + i;
-            setTimeout(function () {
-                if (0 === $("#hashEle_" + key).length) {
-                    // 元素不存在
-                    insertOverTableCell(ele[2], key, value);
-                    // $("#result-table-over").append('<div id="hashEle_' +
-                    // key +
-                    // '" class="cell"><div class="key">' +
-                    // key +
-                    // '</div><div class="value">' +
-                    // value +
-                    // "</div></div>");
-                }
-                updateTableCell(key, value);
-            }, 1000 * i++);
+            key = "o" + i++;
+            queue = queue.then(() => {
+                return promiseFactory(function () {
+                    if (0 === $("#hashEle_" + key).length) {
+                        // 元素不存在
+                        insertOverTableCell(ele[2], key, value);
+                    }
+                    updateTableCell(key, value);
+                });
+            });
         } else if ("overArr" === key) {
-            key = "o" + i;
-            setTimeout(function () {
-                if (0 === $("#hashEle_" + key).length) {
-                    // 元素不存在
-                    $("#result-table-over").append(
-                        '<div id="hashEle_' +
-                            key +
-                            '" class="cell"><div class="key">' +
-                            key +
-                            '</div><div class="value">' +
-                            value +
-                            "</div></div>"
-                    );
-                }
-                updateTableCell(key);
-            }, 1000 * i++);
-        } else {
-            setTimeout(
-                "updateTableCell('" + key + "', '" + value + "')",
-                1000 * i++
-            );
+            key = "o" + i++;
+            queue = queue.then(() => {
+                return promiseFactory(function () {
+                    if (0 === $("#hashEle_" + key).length) {
+                        // 元素不存在
+                        $("#result-table-over").append(
+                            '<div id="list_' +
+                                key +
+                                '" class="list"><div id="hashEle_' +
+                                key +
+                                '" class="cell"><div class="key">' +
+                                key +
+                                '</div><div class="value">' +
+                                value +
+                                "</div></div></div>"
+                        );
+                    }
+                    updateTableCell(key);
+                });
+            });
+        } else if ("listAddr" === key) {
+            queue = queue.then(() => {
+                return promiseFactory(function () {
+                    listAddr_addNode(parseInt(ele[1]), ele[2], ele[3]);
+                });
+            });
+        }else {
+            queue = queue.then(() => {
+                return promiseFactory(() => {
+                    updateTableCell(key, value);
+                });
+            });
         }
     }
+    queue = queue.then(() => {
+        return promiseFactory(() => {
+            $("#table-cell-animation").html("");
+        });
+    });
 }
 
 // 插入元素
 function insertOverTableCell(index, key, value) {
     if (null === $("#result-table-over")[0].firstElementChild) {
         $("#result-table-over").append(
-            '<div id="hashEle_' +
+            '<div id="list_' +
+                key +
+                '" class="list"><div id="hashEle_' +
                 key +
                 '" class="cell"><div class="key">' +
                 key +
                 '</div><div class="value">' +
                 value +
-                "</div></div>"
+                "</div></div></div>"
         );
     } else {
         $(
-            '<div id="hashEle_' +
+            '<div id="list_' +
+                key +
+                '" class="list"><div id="hashEle_' +
                 key +
                 '" class="cell"><div class="key">' +
                 key +
                 '</div><div class="value">' +
                 value +
-                "</div></div>"
+                "</div></div></div>"
         ).insertAfter("#result-table-over > div:nth-child(" + index + ")");
     }
     $("#table-cell-animation").append(
@@ -364,37 +405,6 @@ function insertOverTableCell(index, key, value) {
             "   animation: table-cell-display 2s infinite;" +
             "   animation-iteration-count: 1;" +
             "   animation-fill-mode: forwards;" +
-            "}"
-    );
-}
-
-// 更新动画和值
-function updateTableCell(key, value = null) {
-    $("#table-cell-animation").append(
-        "#result-table{--cell-change-color:red;}" +
-            " #hashEle_" +
-            key +
-            "{" +
-            "   animation: table-cell-display 2s infinite;" +
-            "   animation-iteration-count: 1;" +
-            "   animation-fill-mode: forwards;" +
-            "   -webkit-animation: table-cell-display 2s infinite;" +
-            "   -webkit-animation-iteration-count: 1;" +
-            "   -webkit-animation-fill-mode: forwards;" +
-            "}"
-    );
-    if (value) $("#hashEle_" + key + " .value")[0].textContent = value;
-}
-
-function highLightTableCell(selector) {
-    $("#table-cell-animation").append(
-        "#result-table{--cell-highlight-color:darkorchid;}" +
-            selector +
-            "{" +
-            "   animation: table-cell-highlight 5s infinite;" +
-            "   animation-fill-mode: backwards;" +
-            "   -webkit-animation: table-cell-highlight 5s infinite;" +
-            "   -webkit-animation-fill-mode: backwards;" +
             "}"
     );
 }

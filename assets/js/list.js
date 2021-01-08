@@ -27,7 +27,7 @@ class SingleList {
 
     // 向单链表插入元素
     insert(item, ele){
-        let itemNode = this.find(item);
+        let itemNode = this.find(item)[1];
 
         if(!item)return;
 
