@@ -1,18 +1,24 @@
 <!DOCTYPE html>
+<!-- 
+    TODO:
+        ASL, 查找元素时比较次数 的统计显示
+        终止动画
+-->
 <html>
 
 <head>
     <title>Hash</title>
     <link href="/assets/css/index.css" rel="stylesheet" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <style id="cell-width">
-
     </style>
 </head>
 
 <body>
-    <div style="display:flex;">
+    <div class="data-area">
         <textarea id="data" style="height:100px; width:400px" oninput="dataChange()"></textarea>
-        <div style="display: flex;flex-direction: column;margin-left: 40px;width: 20%;text-align: right;">
+        <div class="hash-value">
             <span>表长：<input id="length" type="number" value="16" style="width: 100px;" /></span>
             <div id="directAddr-value" style="display: inline-grid;">
                 <span>a：<input id="a" type="number" value="1" style="width: 100px;" /></span>
@@ -30,7 +36,7 @@
                     value="key%13+1,key%13+2,key%13+3,key%13+4,key%13+5,key%13+6,key%13+7,key%13+8,key%13+9,key%13+10,key%13+11"
                     style="width: 100px;" /></span>
         </div>
-        <div style="margin-left: 40px;">
+        <div class="result-value">
             表元素占比：<input id="cell-width" value="12" type="range"><input id="cell-width" type="number" max="100" min="0"
                 value="12" onmousewheel />%
         </div>
@@ -108,20 +114,23 @@
                 background-color: var(--cell-change-color, blue);
             }
         }
+
         @keyframes table-cell-highlight {
-            
+
             50% {
                 background-color: var(--cell-highlight-color, blue);
             }
         }
+
         /*Safari 和 Chrome:*/
         @-webkit-keyframes table-cell-display {
             50% {
                 background-color: var(--cell-change-color, blue);
             }
         }
+
         @-webkit-keyframes table-cell-highlight {
-            
+
             50% {
                 background-color: var(--cell-highlight-color, blue);
             }
@@ -135,9 +144,17 @@
         </div>
     </div>
     <!-- 结果表格END -->
-    <div>
-        <h2>搜索:</h2>
-        <input id="search-value" value="" /><button onclick="hashSearch()">搜索</button>
+    <br />
+    <br />
+    <div class="search-group">
+        <div class="search bar6">
+            <span class="search-group-prepend">关键字</span>
+            <input type="text" id="search-value" placeholder="请输入关键字...">
+            <div class="search-group-append">
+                <button style="height: 100%;" onclick="hashSearch()">搜索</button>
+            </div>
+        </div>
+
         <p>搜索情况：<span id="search-result"></span></p>
     </div>
     <div></div>
@@ -171,6 +188,11 @@
                 $('input[id="cell-width"]')[0].value = $(
                     'input[id="cell-width"]'
                 )[1].value = e.currentTarget.value;
+            },
+        });
+        $('input[id="length"]').bind({
+            "input propertychange": function (e) {
+                updateLength(e.currentTarget.value)
             },
         });
         //哈希搜索绑定回车键

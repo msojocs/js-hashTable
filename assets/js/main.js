@@ -44,7 +44,7 @@ function constructorChange() {
         // =========直接定址法==========
         // 隐藏冲突处理方法
         document.getElementById("collision-area").style["display"] = "none";
-        $('#result-over-area').css('display', 'none')
+        $("#result-over-area").css("display", "none");
         // 显示直接定址法的 参数输入框
         document.getElementById("directAddr-value").style["display"] =
             "inline-grid";
@@ -60,23 +60,25 @@ function constructorChange() {
 }
 
 // 更新表长
-function updateLength() {
-    let data = document.getElementById("data").value;
-    let constructor = getConstructor();
-    if (
-        "directAddr" === constructor ||
-        "digitAnalyze" === constructor ||
-        "fold" === constructor
-    ) {
-        // 更新表长
-        $("#length")[0].value = data.split("\n").length + 1;
-    } else {
-        $("#length")[0].value = data.split(",").length + 1;
+function updateLength(length = null) {
+    if (!length) {
+        let data = document.getElementById("data").value;
+        let constructor = getConstructor();
+        if (
+            "directAddr" === constructor ||
+            "digitAnalyze" === constructor ||
+            "fold" === constructor
+        ) {
+            // 更新表长
+            length = $("#length")[0].value = data.split("\n").length + 1;
+        } else {
+            length = $("#length")[0].value = data.split(",").length + 1;
+        }
     }
     // 清空表格
     $("#result-table").html("");
     // 添加元素
-    for (var i = 0; i < $("#length")[0].value; i++) {
+    for (var i = 0; i < length; i++) {
         appendTableCell(i, "null");
     }
 }
@@ -120,31 +122,30 @@ function collisionChange() {
     } else {
         $("#reHash-area").css("display", "none");
     }
-    if('overList' === collision || 'overArr' === collision){
-        $('#result-over-area').css('display', 'block')
-    }else{
-        $('#result-over-area').css('display', 'none')
+    if ("overList" === collision || "overArr" === collision) {
+        $("#result-over-area").css("display", "block");
+    } else {
+        $("#result-over-area").css("display", "none");
     }
 }
 
 // 哈希搜索
 function hashSearch(value = "") {
     value = $("#search-value")[0].value;
-    console.log('准备搜索-->', value);
+    console.log("准备搜索-->", value);
     if (!ht) {
         $("#search-result")[0].textContent = "哈希表还未生成(T_T)";
         return;
     }
     $("#table-cell-animation").html("");
-    let result = ht.search(value)
+    let result = ht.search(value);
     console.log(result);
-    $("#search-result")[0].textContent = result
-        ? "找到！"
-        : "未找到~";
-    if(result && result[2] && result[2] === true){
-        highLightTableCell('#result-table-over > div:nth-child(' + (result[0] + 1) + ')')
-    }else
-    if(result)highLightTableCell('#hashEle_' + result[0])
+    $("#search-result")[0].textContent = result ? "找到！" : "未找到~";
+    if (result && result[2] && result[2] === true) {
+        highLightTableCell(
+            "#result-table-over > div:nth-child(" + (result[0] + 1) + ")"
+        );
+    } else if (result) highLightTableCell("#hashEle_" + result[0]);
 }
 
 // 生成哈希表
@@ -157,12 +158,12 @@ function genHashTable() {
     // console.log(data);
     console.log("constructor->", constructor, "|", "collision->", collision);
 
-    try{
-    ht = new HashTable(length, constructor, collision);
-    }catch(e){
-        alert(e)
+    try {
+        ht = new HashTable(length, constructor, collision);
+    } catch (e) {
+        alert(e);
     }
-    
+
     let exps = [];
     if ("reHash" === collision) {
         exps = getReHashExp();
@@ -213,7 +214,7 @@ function genHashTable() {
     console.log(ht.storage);
 
     // document.getElementById("result").innerHTML = ht.toString();
-    console.log('显示队列：', ht.queue.toString());
+    console.log("显示队列：", ht.queue.toString());
     updateTable();
 }
 
@@ -282,7 +283,7 @@ function appendTableCell(key, value) {
     );
 }
 function updateTable() {
-    let q = ht.queue;
+    let q = ht.queue;   // 动画队列
     var i = 0;
     $("#table-cell-animation").html("");
     while (!q.isEmpty()) {
@@ -306,18 +307,20 @@ function updateTable() {
                 }
                 updateTableCell(key, value);
             }, 1000 * i++);
-        }else if("overArr" === key){
+        } else if ("overArr" === key) {
             key = "o" + i;
             setTimeout(function () {
                 if (0 === $("#hashEle_" + key).length) {
                     // 元素不存在
-                    $("#result-table-over").append('<div id="hashEle_' +
-                    key +
-                    '" class="cell"><div class="key">' +
-                    key +
-                    '</div><div class="value">' +
-                    value +
-                    "</div></div>");
+                    $("#result-table-over").append(
+                        '<div id="hashEle_' +
+                            key +
+                            '" class="cell"><div class="key">' +
+                            key +
+                            '</div><div class="value">' +
+                            value +
+                            "</div></div>"
+                    );
                 }
                 updateTableCell(key);
             }, 1000 * i++);
@@ -380,13 +383,13 @@ function updateTableCell(key, value = null) {
             "   -webkit-animation-fill-mode: forwards;" +
             "}"
     );
-    if(value)$("#hashEle_" + key + " .value")[0].textContent = value;
+    if (value) $("#hashEle_" + key + " .value")[0].textContent = value;
 }
 
 function highLightTableCell(selector) {
     $("#table-cell-animation").append(
         "#result-table{--cell-highlight-color:darkorchid;}" +
-        selector +
+            selector +
             "{" +
             "   animation: table-cell-highlight 5s infinite;" +
             "   animation-fill-mode: backwards;" +
