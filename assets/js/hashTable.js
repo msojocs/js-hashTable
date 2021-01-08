@@ -28,6 +28,7 @@ class HashTable {
         this.exps = [];
         // 队列
         this.queue = new SingleList();
+        this.use = 0;
     }
 
     // 直接定址法 Hkey = a * key + b
@@ -65,25 +66,19 @@ class HashTable {
 
     // 填入调用
     push(key, value = null) {
+        // TODO:溢出检测，待完善
+        if(this.use >= this.length)return false;
+
         if (!value) value = key;
         let Hkey = this.hashFunc(key);
-        // console.log('Hkey-->', Hkey);
-        switch (this.createMethod) {
-            case "directAddr":
-                // 直接定址法无冲突，直接填入
-                this.pushDA(Hkey, value);
-                return;
-                break;
-
-            default:
-                break;
+        
+        if("directAddr" === this.createMethod){
+            // 直接定址法无冲突，直接填入
+            this.pushDA(Hkey, value);
+            return;
         }
 
         switch (this.collisionMethod) {
-            // 链地址
-            case "ListAddr":
-                this.pushListAddr(Hkey, value);
-                break;
             // 开放定址法
             case "OALine":
             case "OASecond":
@@ -97,6 +92,10 @@ class HashTable {
             case "reHash":
                 this.pushReHash(Hkey, key, value);
                 break;
+            // 链地址
+            case "ListAddr":
+                this.pushListAddr(Hkey, value);
+                break;
             // 溢出区
             case "overArr":
                 this.pushOverArr(Hkey, value);
@@ -108,23 +107,13 @@ class HashTable {
                 console.log("未识别的冲突处理方法");
                 break;
         }
+        this.use++;
     }
 
-    // 再哈希
-    pushReHash(Hkey, key, value) {
-        let d = 0;
-        while (
-            Hkey &&
-            null !== this.storage[Hkey] &&
-            undefined !== this.storage[Hkey]
-        ) {
-            // 被占用
-            Hkey = this.CF_reHash(key, d++);
-        }
-        if (Hkey) {
-            this.storage[Hkey] = value;
-            this.queue.append(Hkey + "," + value);
-        }
+    // 直接定址法填入元素
+    pushDA(Hkey, value) {
+        this.storage[Hkey] = value;
+        this.queue.append(Hkey + "," + value);
     }
     // 开放地址填入元素
     pushOA(Hkey, key, value = key) {
@@ -142,10 +131,79 @@ class HashTable {
         this.queue.append(Hkey + "," + value);
     }
 
-    // 直接定址法填入元素
-    pushDA(Hkey, value) {
-        this.storage[Hkey] = value;
-        this.queue.append(Hkey + "," + value);
+
+    // 再哈希
+    pushReHash(Hkey, key, value) {
+        let d = 0;
+        while (
+            Hkey &&
+            null !== this.storage[Hkey] &&
+            undefined !== this.storage[Hkey]
+        ) {
+            // 被占用
+            Hkey = this.CF_reHash(key, d++);
+        }
+        if (Hkey) {
+            this.storage[Hkey] = value;
+            this.queue.append(Hkey + "," + value);
+        }
+    }
+    // 链地址法填入
+    pushListAddr(Hkey, key) {
+        var pos = 1;
+        if (null === this.storage[Hkey]) {
+            this.storage[Hkey] = new SingleList();
+            this.storage[Hkey].append(key);
+        } else {
+            // 有序插入
+            let currNode = this.storage[Hkey].head;
+            while (currNode.next && currNode.next.data < key) {
+                pos++;
+                currNode = currNode.next;
+            }
+            this.storage[Hkey].insert(currNode.data, key);
+        }
+        this.queue.append("listAddr," + Hkey + "," + pos + "," + key);
+    }
+
+    // 公共溢出区填入[顺序]
+    pushOverArr(Hkey, value) {
+        if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
+            // 冲突
+            if (this.over === null) this.over = [];
+            this.over.push(value);
+            this.queue.append("overArr," + value);
+        } else {
+            // 无冲突
+            this.storage[Hkey] = value;
+            this.queue.append(Hkey + "," + value);
+        }
+    }
+    // 公共溢出区填入[链式]
+    pushOverList(Hkey, value) {
+        if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
+            // 冲突了
+            if (this.over === null) {
+                this.over = new SingleList();
+                this.over.append(value);
+                this.queue.append("overList," + value + ",0");
+            } else {
+                // 有序插入
+                let currNode = this.over.head;
+                var i = 0;
+                while (currNode.next && currNode.next.data < value) {
+                    i++;
+                    currNode = currNode.next;
+                }
+                console.log(Hkey, value)
+                this.over.insert(currNode.data, value);
+                this.queue.append("overList," + value + "," + i);
+            }
+        } else {
+            // 无冲突
+            this.storage[Hkey] = value;
+            this.queue.append(Hkey + "," + value);
+        }
     }
 
     // 搜索
@@ -283,7 +341,6 @@ class HashTable {
     // 折叠法（ISBN）
     HF_fold(key = "") {
         key = key.replaceAll("-", "");
-        console.log(key);
         // 模式： 0 普通型 | 1 S型
         let mode = 1;
         let d = this.length.toString().length;
@@ -366,62 +423,6 @@ class HashTable {
         return eval(exp);
     }
 
-    // 链地址法
-    pushListAddr(Hkey, key) {
-        var pos = 1;
-        if (null === this.storage[Hkey]) {
-            this.storage[Hkey] = new SingleList();
-            this.storage[Hkey].append(key);
-        } else {
-            // 有序插入
-            let currNode = this.storage[Hkey].head;
-            while (currNode.next && currNode.next.data < key) {
-                pos++;
-                currNode = currNode.next;
-            }
-            this.storage[Hkey].insert(currNode.data, key);
-        }
-        this.queue.append("listAddr," + Hkey + "," + pos + "," + key);
-    }
-
-    // 公共溢出区
-    pushOverArr(Hkey, value) {
-        if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
-            // 冲突
-            if (this.over === null) this.over = [];
-            this.over.push(value);
-            this.queue.append("overArr," + value);
-        } else {
-            // 无冲突
-            this.storage[Hkey] = value;
-            this.queue.append(Hkey + "," + value);
-        }
-    }
-    pushOverList(Hkey, value) {
-        if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
-            // 冲突了
-            if (this.over === null) {
-                this.over = new SingleList();
-                this.over.append(value);
-                this.queue.append("overList," + value + ",0");
-            } else {
-                // 有序插入
-                let currNode = this.over.head;
-                var i = 0;
-                while (currNode.next && currNode.next.data < value) {
-                    i++;
-                    currNode = currNode.next;
-                }
-                console.log(Hkey, value)
-                this.over.insert(currNode.data, value);
-                this.queue.append("overList," + value + "," + i);
-            }
-        } else {
-            // 无冲突
-            this.storage[Hkey] = value;
-            this.queue.append(Hkey + "," + value);
-        }
-    }
 }
 
 // let data = [19, 14, 23, 01, 68, 20, 84, 27, 55, 11, 10, 79];

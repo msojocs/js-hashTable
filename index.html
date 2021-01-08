@@ -2,8 +2,9 @@
 <!-- 
     TODO:
         ASL, 查找元素时比较次数 的统计显示
-        终止动画
-        链地址法显示
+        强制终止动画
+        异常检测：装填因子达到100%
+        搜索过程？考虑一下
 -->
 <html>
 
@@ -178,6 +179,7 @@
     <script type="text/javascript" src="assets/js/main.js"></script>
     <script type="text/javascript">
         var isbn, square, student, ht;
+        const animation_delay = 0.5;  // s 秒
         // 初始化
         getData();
         constructorChange();

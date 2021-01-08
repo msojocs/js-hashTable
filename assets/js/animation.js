@@ -1,4 +1,3 @@
-
 // 效果
 function tableAnimation() {
     let q = ht.queue; // 动画队列
@@ -10,7 +9,7 @@ function tableAnimation() {
         let key = ele[0];
         let value = ele[1];
         if ("overList" === key) {
-            // console.log("溢出区->", ht.over.toString());
+            // 链式溢出区
             key = "o" + i++;
             queue = queue.then(() => {
                 return promiseFactory(function () {
@@ -22,6 +21,7 @@ function tableAnimation() {
                 });
             });
         } else if ("overArr" === key) {
+            // 数组式溢出区
             key = "o" + i++;
             queue = queue.then(() => {
                 return promiseFactory(function () {
@@ -43,6 +43,7 @@ function tableAnimation() {
                 });
             });
         } else if ("listAddr" === key) {
+            // 链地址
             queue = queue.then(() => {
                 return promiseFactory(function () {
                     listAddr_addNode(parseInt(ele[1]), ele[2], ele[3]);
@@ -70,10 +71,10 @@ function updateTableCell(key, value = null) {
             " #hashEle_" +
             key +
             "{" +
-            "   animation: table-cell-display 2s infinite;" +
+            "   animation: table-cell-display " + animation_delay + "s infinite;" +
             "   animation-iteration-count: 1;" +
             "   animation-fill-mode: forwards;" +
-            "   -webkit-animation: table-cell-display 2s infinite;" +
+            "   -webkit-animation: table-cell-display " + animation_delay + "s infinite;" +
             "   -webkit-animation-iteration-count: 1;" +
             "   -webkit-animation-fill-mode: forwards;" +
             "}"
@@ -81,6 +82,7 @@ function updateTableCell(key, value = null) {
     if (value) $("#hashEle_" + key + " .value")[0].textContent = value;
 }
 
+// 高亮显示找到的元素
 function highLightTableCell(selector) {
     $("#table-cell-animation").append(
         "#result-table{--cell-highlight-color:darkorchid;}" +
@@ -186,6 +188,6 @@ function promiseFactory(r) {
         r();
         setTimeout(() => {
             resolve();
-        }, 2000);
+        }, animation_delay * 1000);
     });
 }

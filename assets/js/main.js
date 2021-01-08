@@ -160,6 +160,11 @@ function hashSearch(value = "") {
         highLightTableCell(
             "#result-table-over > div:nth-child(" + (result[0] + 1) + ") > .cell"
         );
+    }if (result && result[2] && "boolean" !== typeof result[2]) {
+        // 链地址法
+        highLightTableCell(
+            "#result-table > div:nth-child(" + (result[0] + 1) + ") > div:nth-child(" + (result[1] + 1) + ")"
+        );
     } else if (result) highLightTableCell("#hashEle_" + result[0]);
 }
 
