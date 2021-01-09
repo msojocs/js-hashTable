@@ -54,7 +54,7 @@
 }
 
 /* search */
-input:focus {
+input:focus, textarea:focus {
     color: #495057;
     background-color: #fff;
     border-color: #80bdff;

@@ -190,7 +190,7 @@
         $('input[id="cell-width"]').bind({
             "input propertychange": function (e) {
                 $("#cell-width").html(
-                    "body{--cell-width:" + e.currentTarget.value + "vw}"
+                    "body{--cell-width:" + e.currentTarget.value + "%}"
                 );
                 $('input[id="cell-width"]')[0].value = $(
                     'input[id="cell-width"]'

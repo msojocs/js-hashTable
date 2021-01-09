@@ -88,9 +88,9 @@ function highLightTableCell(selector) {
         "#result-table{--cell-highlight-color:darkorchid;}" +
             selector +
             "{" +
-            "   animation: table-cell-highlight 5s infinite;" +
+            "   animation: table-cell-highlight 0.3s infinite;" +
             "   animation-fill-mode: backwards;" +
-            "   -webkit-animation: table-cell-highlight 5s infinite;" +
+            "   -webkit-animation: table-cell-highlight 0.3s infinite;" +
             "   -webkit-animation-fill-mode: backwards;" +
             "}"
     );

@@ -27,38 +27,6 @@ function dataChange() {
     updateLength();
 }
 
-// 改变构造方法
-function constructorChange() {
-    let constructor = getConstructor();
-    console.log(constructor);
-    if ("mod" === constructor) {
-        // 显示p输入框
-        $("#mod-area").css("display", "block");
-    } else {
-        // 隐藏p输入框
-        $("#mod-area").css("display", "none");
-    }
-    // 初始化数据
-    initData();
-    if ("directAddr" === constructor) {
-        // =========直接定址法==========
-        // 隐藏冲突处理方法
-        document.getElementById("collision-area").style["display"] = "none";
-        $("#result-over-area").css("display", "none");
-        // 显示直接定址法的 参数输入框
-        document.getElementById("directAddr-value").style["display"] =
-            "inline-grid";
-        $("#reHash-area").css("display", "none");
-    } else {
-        // 显示冲突处理方法
-        document.getElementById("collision-area").style["display"] = "flex";
-        // 隐藏直接定址法的 参数输入框
-        document.getElementById("directAddr-value").style["display"] = "none";
-        collisionChange();
-    }
-    dataChange();
-}
-
 // 更新表长
 function updateLength(length = null) {
     if (!length) {
@@ -122,6 +90,38 @@ function initData() {
     }
 }
 
+// 改变构造方法
+function constructorChange() {
+    let constructor = getConstructor();
+    console.log(constructor);
+    if ("mod" === constructor) {
+        // 显示p输入框
+        $("#mod-area").css("display", "block");
+    } else {
+        // 隐藏p输入框
+        $("#mod-area").css("display", "none");
+    }
+    // 初始化数据
+    initData();
+    if ("directAddr" === constructor) {
+        // =========直接定址法==========
+        // 隐藏冲突处理方法
+        document.getElementById("collision-area").style["display"] = "none";
+        $("#result-over-area").css("display", "none");
+        // 显示直接定址法的 参数输入框
+        document.getElementById("directAddr-value").style["display"] =
+            "inline-grid";
+        $("#reHash-area").css("display", "none");
+    } else {
+        // 显示冲突处理方法
+        document.getElementById("collision-area").style["display"] = "flex";
+        // 隐藏直接定址法的 参数输入框
+        document.getElementById("directAddr-value").style["display"] = "none";
+        collisionChange();
+    }
+    dataChange();
+}
+
 // 改变冲突处理方法
 function collisionChange() {
     let collision = getCollision();
@@ -134,6 +134,8 @@ function collisionChange() {
     {
         listAddrModeSwitch(true)
     }else{
+        $("#result-table").html('')
+        updateLength()
         listAddrModeSwitch()
     }
     if ("overList" === collision || "overArr" === collision) {
@@ -160,7 +162,7 @@ function hashSearch(value = "") {
         highLightTableCell(
             "#result-table-over > div:nth-child(" + (result[0] + 1) + ") > .cell"
         );
-    }if (result && result[2] && "boolean" !== typeof result[2]) {
+    }else if (result && result[2] && "boolean" !== typeof result[2]) {
         // 链地址法
         highLightTableCell(
             "#result-table > div:nth-child(" + (result[0] + 1) + ") > div:nth-child(" + (result[1] + 1) + ")"
