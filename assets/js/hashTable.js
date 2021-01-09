@@ -151,7 +151,7 @@ class HashTable {
     // 链地址法填入
     pushListAddr(Hkey, key) {
         var pos = 1;
-        if (null === this.storage[Hkey]) {
+        if (null === this.storage[Hkey] || undefined === this.storage[Hkey]) {
             this.storage[Hkey] = new SingleList();
             this.storage[Hkey].append(key);
         } else {
@@ -320,9 +320,11 @@ class HashTable {
     // 平方取中法（BASIC标识符）
     HF_square(key) {
         var dict = {};
+        // 生成字典，26个大写英文字母对应8进制数字 A-1|B-2|...
         for (var i = 0; i < 26; i++) {
             dict[String.fromCharCode(65 + i)] = (i + 1).toString(8);
         }
+        // 追加字典，10个十进制数对应8进制数 0-60|1-61|...
         for (var i = 0; i < 9; i++) {
             dict[i] = (i + 48).toString(8);
         }
@@ -330,12 +332,16 @@ class HashTable {
         key.forEach((ele, i) => {
             key[i] = dict[ele];
         });
+        // 单个字母末尾追加00
         if (key.length == 1) key.push("00");
+        // 拼接为8进制数
         key = parseInt(key.join(""));
+        // 8进制平方（转为10进制平方后转为8进制）
         key = Math.pow(parseInt(key, 8), 2).toString(8);
+        // 取从右往左数第 4、5、6位 的数
         key = key.substring(0, key.length - 3).substr(-3);
         // throw new Error("")
-        return key;
+        return key % this.length;
     }
 
     // 折叠法（ISBN）

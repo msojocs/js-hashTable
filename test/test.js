@@ -1,3 +1,12 @@
+let arr = []
+for (var i = 0; i < 26; i++) {
+    let c = String.fromCharCode(65 + i);
+    for(var j = 0; j < 10; j++){
+        arr.push(c + j);
+    }
+}
+console.log(arr.join(','))
+throw new Error('')
 function promiseFactory(index) {
     return new Promise((resolve, reject) => {
         console.log(index);
