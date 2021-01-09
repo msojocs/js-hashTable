@@ -145,31 +145,6 @@ function collisionChange() {
     }
 }
 
-// 哈希搜索
-function hashSearch(value = "") {
-    value = $("#search-value")[0].value;
-    console.log("准备搜索-->", value);
-    if (!ht) {
-        $("#search-result")[0].textContent = "哈希表还未生成(T_T)";
-        return;
-    }
-    $("#table-cell-animation").html("");
-    let result = ht.search(value);
-    console.log(result);
-    $("#search-result")[0].textContent = result ? "找到！" : "未找到~";
-    if (result && result[2] && result[2] === true) {
-        // 溢出区
-        highLightTableCell(
-            "#result-table-over > div:nth-child(" + (result[0] + 1) + ") > .cell"
-        );
-    }else if (result && result[2] && "boolean" !== typeof result[2]) {
-        // 链地址法
-        highLightTableCell(
-            "#result-table > div:nth-child(" + (result[0] + 1) + ") > div:nth-child(" + (result[1] + 1) + ")"
-        );
-    } else if (result) highLightTableCell("#hashEle_" + result[0]);
-}
-
 // 生成哈希表
 function genHashTable() {
     let constructor = getConstructor();
@@ -238,6 +213,73 @@ function genHashTable() {
     // document.getElementById("result").innerHTML = ht.toString();
     console.log("显示队列：", ht.queue.toString());
     tableAnimation();
+}
+
+// 哈希搜索
+function hashSearch(value = "") {
+    value = $("#search-value")[0].value;
+    console.log("准备搜索-->", value);
+    if (!ht) {
+        $("#search-result")[0].textContent = "哈希表还未生成(T_T)";
+        return;
+    }
+    $("#table-cell-animation").html("");
+    let result = ht.search(value);
+    let hInfo = result[0];
+    let cnt = result[1];
+    let mark = result[2];
+
+    console.log(result);
+    $("#search-result")[0].textContent = result ? "找到！比较次数：" + cnt : "未找到~";
+    if (result && "over" === mark) {
+        // 溢出区
+        highLightTableCell(
+            "#result-table-over > div:nth-child(" + (hInfo[0] + 1) + ") > .cell"
+        );
+    }else if ("ListAddr" === ht.collisionMethod) {
+        // 链地址法
+        highLightTableCell(
+            "#result-table > div:nth-child(" + (hInfo[0] + 1) + ") > div:nth-child(" + (hInfo[1] + 1) + ")"
+        );
+    } else if (result) highLightTableCell("#hashEle_" + hInfo[0]);
+}
+
+// ASL计算
+function calculateASL(){
+    if(!ht)return false;
+    let data = document.getElementById("data").value;
+    var keys = []
+    switch(ht.createMethod){
+        case "directAddr":
+            data = data.split('\n');
+            data.forEach((ele)=>{
+                if(ele.length > 1 && ele.indexOf(',') !== -1)
+                keys.push(data.split(',')[0])
+            })
+            break;
+        case "digitAnalyze":
+        case "fold":
+            keys = data.split('\n');
+            for(var i=0; i < keys.length; i++){
+                if(keys[i].length < 1){
+                    keys.splice(i, 1)
+                    i--;
+                }
+            }
+            break;
+        case "square":
+        case "mod":
+            keys = data.split(',')
+            break;
+    }
+    var sum = 0;
+    keys.forEach((key)=>{
+        let cnt = ht.search(key)[1]
+        sum += cnt;
+    })
+    let asl = sum / keys.length;
+    $('#asl-result').html(asl)
+    console.log(asl)
 }
 
 function getReHashExp() {

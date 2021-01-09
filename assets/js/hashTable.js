@@ -1,6 +1,15 @@
-const seed = new Date().getTime(); // 当次运行时为定值，用于伪随机搜索
+const seed = new Date().getTime(); // 伪随机种子，当次运行时为定值，用于伪随机搜索
 class HashTable {
 
+    /**
+     * 哈希表对象构造函数
+     *
+     * @param length 哈希表长度
+     * @param create 构造类型[DA, , , , MOD]
+     * @param collision 冲突处理类型[OA(OALine|OASecond|OARand), RH, ListAddr, OverAddr]
+     * @param a 直接定址法[Hkey = a * key + b]
+     * @param b 直接定址法[Hkey = a * key + b]
+     */
     constructor(
         length = 11,
         create = "directAddr",
@@ -8,10 +17,12 @@ class HashTable {
         a = 1,
         b = 0
     ) {
+        // 初始化哈希表
         this.storage = [];
         for (var i = 0; i < length; i++) this.storage[i] = null;
-        this.count = 0;
-        // 表长
+        // 哈希表元素填充计数
+        this.use = 0;
+        // 哈希表长
         this.length = length;
         // 构造方法
         this.createMethod = create;
@@ -25,10 +36,10 @@ class HashTable {
         this.setAB(a, b);
         // 伪随机种子
         this.randSeed = HashTable.seed; // 变化值，产生伪随机序列
+        // 再哈希函数列表
         this.exps = [];
-        // 队列
+        // 动画队列
         this.queue = new SingleList();
-        this.use = 0;
     }
 
     // 直接定址法 Hkey = a * key + b
@@ -206,7 +217,12 @@ class HashTable {
         }
     }
 
-    // 搜索
+    /**
+     * 搜索
+     * 
+     * @param {*} key 待查找关键字
+     * @returns {list} [[Hkey, value], cmpCnt, mark]
+     */
     search(key) {
         let Hkey = this.hashFunc(key);
         // console.log('Hkey-->', Hkey);
@@ -248,7 +264,7 @@ class HashTable {
     }
     // 直接定址法搜索
     searchDA(Hkey) {
-        if (this.storage[Hkey]) return [Hkey, this.storage[Hkey]];
+        if (this.storage[Hkey]) return [[Hkey, this.storage[Hkey]], 1];
         else return false;
     }
     // 开放地址法搜索
@@ -263,7 +279,7 @@ class HashTable {
             if (undefined === this.storage[Hkey] || null === this.storage[Hkey])
                 return false;
         }
-        return [Hkey, this.storage[Hkey]];
+        return [[Hkey, this.storage[Hkey]], d];
     }
     // 链地址法搜索
     searchListAddr(Hkey, key) {
@@ -276,7 +292,7 @@ class HashTable {
             currNode = currNode.next;
         }
         if (currNode) {
-            return [Hkey, i, key];
+            return [[Hkey, i, key], i];
         } else return false;
     }
     // 再哈希
@@ -287,37 +303,52 @@ class HashTable {
             Hkey = this.CF_reHash(key, d++);
         }
         if (Hkey) {
-            return this.storage[Hkey];
+            return [[Hkey, this.storage[Hkey]], 0];
         }
     }
     // 溢出区
     searchOver(Hkey, key) {
-        if (key === this.storage[Hkey]) return [Hkey, key, false];
+        if (key === this.storage[Hkey]) return [[Hkey, key], 0];
         if (ht.over instanceof SingleList) {
             let result = this.over.find(key);
-            if (result) return [result[0] - 1, result[1].data, true];
+            if (result) return [[result[0] - 1, result[1].data], result[0], 'over'];
             return false;
         }
         let index = this.over.indexOf(key);
-        if (-1 !== index) return [index, key, true];
+        if (-1 !== index) return [[index, key], index, 'over'];
         return false;
     }
 
     // ==============构造=============
-    // 直接定址法
+    /**
+     * 直接定址法
+     * 
+     * @param {*} key 关键字
+     * @return {number} 哈希地址
+     */
     HF_directAddr(key) {
         let Hkey = this.a * key + this.b;
         return Hkey;
     }
 
-    // 数字分析法(学号)
+    /**
+     * 数字分析法(学号)
+     * 
+     * @param {*} key 关键字
+     * @return {number} 地址
+     */
     HF_digitAnalyze(key) {
         key = key.substr(-3);
         // throw new Error("")
         return parseInt(key);
     }
 
-    // 平方取中法（BASIC标识符）
+    /**
+     * 平方取中法（BASIC标识符）
+     * 
+     * @param {*} key 关键字
+     * @return {number} 哈希地址
+     */
     HF_square(key) {
         var dict = {};
         // 生成字典，26个大写英文字母对应8进制数字 A-1|B-2|...
@@ -344,11 +375,16 @@ class HashTable {
         return key % this.length;
     }
 
-    // 折叠法（ISBN）
-    HF_fold(key = "") {
+    /**
+     * 折叠法（ISBN）
+     * 
+     * @param {*} key 关键字
+     * @param {*} mode 模式： 0 普通型 | 1 S型
+     * 
+     * @return {number} 哈希地址
+     */
+    HF_fold(key = "", mode = 1) {
         key = key.replaceAll("-", "");
-        // 模式： 0 普通型 | 1 S型
-        let mode = 1;
         let d = this.length.toString().length;
         let part = [];
         while (key) {
@@ -366,14 +402,26 @@ class HashTable {
         return sum % Math.pow(10, d);
     }
 
-    // 除留取余法
+    /**
+     * 除留取余法
+     * 
+     * @param {*} key 关键字
+     * @return {number} 哈希地址
+     */
     HF_mod(key) {
         return key % this.p;
     }
     // ==============构造END=============
 
-    // 冲突处理-开放定址法（包含三个子项）
-    collisionOA(key, d) {
+    /**
+     * 冲突处理-开放定址法（包含三个子项）
+     * 
+     * @param {*} key 关键字
+     * @param {number} d 采用冲突因子的序号，理论为递增
+     * 
+     * @return {number} 哈希地址
+     */
+    collisionOA(key, d = 1) {
         return (
             (this.hashFunc(key) + this["CF_" + this.collisionMethod](d)) %
             this.length
@@ -393,6 +441,7 @@ class HashTable {
      * 二次探测再散列
      *
      * @param {*} i 1, 2, 3 ...
+     * @return {number} 哈希地址[冲突处理后]
      */
     CF_OASecond(i) {
         return (
@@ -405,6 +454,7 @@ class HashTable {
      * 伪随机
      *
      * @param {*} round 范围：表长
+     * @return {number} 哈希地址[冲突处理后]
      */
     CF_OARand(round) {
         return this.rand(this.length);
@@ -419,7 +469,14 @@ class HashTable {
     }
     // -----------开放定址法END----------
 
-    // 再哈希
+    /**
+     * 再哈希
+     * 
+     * @param {*} key 关键字
+     * @param {*} d 要采用的新哈希函数的序号
+     * 
+     * @return {number} 哈希地址[冲突处理后]
+     */
     CF_reHash(key, d) {
         let exp = this.exps[d];
         if (d > this.exps.length - 1) return false;
@@ -431,6 +488,7 @@ class HashTable {
 
 }
 
+// ------------------test area---------------测试区域--------------test area---------------测试区域--------------//
 // let data = [19, 14, 23, 01, 68, 20, 84, 27, 55, 11, 10, 79];
 
 // console.log(data);

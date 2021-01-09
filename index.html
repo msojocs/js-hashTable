@@ -2,9 +2,9 @@
 <!-- 
     TODO:
         ASL, 查找元素时比较次数 的统计显示
+        完善异常检测：装填因子达到100%
         强制终止动画
-        异常检测：装填因子达到100%
-        搜索过程？考虑一下
+        搜索过程动画？考虑一下
 -->
 <html>
 
@@ -162,7 +162,11 @@
 
         <p>搜索情况：<span id="search-result"></span></p>
     </div>
-    <div></div>
+    <br />
+    <button onclick="calculateASL()">计算ASL</button>
+    <div>
+        <p>ASL:<span id="asl-result"></span></p>
+    </div>
     <script>
         // onerror = function(msg, url, row,col) {
         //     var txt = '';
