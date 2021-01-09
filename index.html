@@ -35,9 +35,11 @@
                 </span>
             </div>
             <span id="mod-area">p：<input id="p" type="number" value="13" style="width: 100px;" /></span>
-            <span id="reHash-area" style="display: none;">再哈希函数：<input id="reHashExp" type="text"
-                    value="key%13+1,key%13+2,key%13+3,key%13+4,key%13+5,key%13+6,key%13+7,key%13+8,key%13+9,key%13+10,key%13+11"
-                    style="width: 100px;" /></span>
+            <div id="reHash-area" style="display: none;text-align: left;">
+                <span>再哈希函数（每行一个，key为关键字）：</span>
+                <br />
+                <textarea id="reHashExp" type="text"style="width: 100px;" ></textarea>
+            </div>
         </div>
         <div class="result-value">
             元素宽占比：<input id="cell-width" value="12" type="range"><input id="cell-width" type="number" max="100" min="0"
@@ -188,7 +190,7 @@
         $('input[id="cell-width"]').bind({
             "input propertychange": function (e) {
                 $("#cell-width").html(
-                    "body{--cell-width:" + e.currentTarget.value + "%}"
+                    "body{--cell-width:" + e.currentTarget.value + "vw}"
                 );
                 $('input[id="cell-width"]')[0].value = $(
                     'input[id="cell-width"]'

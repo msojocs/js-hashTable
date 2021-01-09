@@ -240,7 +240,16 @@ function genHashTable() {
 
 function getReHashExp() {
     let exp = $("#reHashExp")[0].value;
-    return exp.split(",");
+    let exps = exp.split("\n");
+    for(var i=0; i < exps.length; i++){
+        if(-1 === exps[i].indexOf('key'))
+        {
+            console.log('忽略无效的表达式：', exps[i])
+            exps.splice(i,1)
+            i--
+        }
+    }
+    return exps;
 }
 function getConstructor() {
     let c = document.getElementsByName("constructor");
@@ -287,6 +296,14 @@ function getData() {
         success: function (result) {
             // console.log(result)
             student = result;
+        },
+    });
+    $.ajax({
+        url: "data/reHash.txt",
+        async: true,
+        success: function (result) {
+            // console.log(result)
+            $('#reHashExp').html(result)
         },
     });
 }
