@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- 
     TODO:
+        BUG: 二次探测再散列算出负数
         ASL, 查找元素时比较次数 的统计显示
         完善异常检测：装填因子达到100%
         强制终止动画
@@ -18,7 +19,7 @@
     <style id="list-addr-animation"></style>
 </head>
 
-<body>
+<body style="background-color: #0b5067;"> 
     <div class="data-area">
         <textarea id="data" style="height:100px; width:400px" oninput="dataChange()"></textarea>
         <div class="hash-value">
@@ -141,6 +142,7 @@
             }
         }
     </style>
+    <br />
     <div id="result-table" class="table">
     </div>
     <div id="result-over-area">
@@ -151,12 +153,14 @@
     <!-- 结果表格END -->
     <br />
     <br />
+
+    <!-- 搜索框 -->
     <div class="search-group">
         <div class="search bar6">
             <span class="search-group-prepend">关键字</span>
             <input type="text" id="search-value" placeholder="请输入关键字...">
             <div class="search-group-append">
-                <button style="height: 100%;" onclick="hashSearch()">搜索</button>
+                <button onclick="hashSearch()">搜索</button>
             </div>
         </div>
 
@@ -179,13 +183,12 @@
     </script>
     <script type="text/javascript" src="//upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="assets/js/list.js"></script>
-    <script type="text/javascript" src="assets/js/stack.js"></script>
     <script type="text/javascript" src="assets/js/hashTable.js"></script>
     <script type="text/javascript" src="assets/js/animation.js"></script>
     <script type="text/javascript" src="assets/js/main.js"></script>
     <script type="text/javascript">
         var isbn, square, student, ht;
-        const animation_delay = 0.5;  // s 秒
+        const animation_delay = 0.5;  // 动画持续时间 s 秒
         // 初始化
         getData();
         constructorChange();

@@ -29,6 +29,7 @@ function dataChange() {
 
 // 更新表长
 function updateLength(length = null) {
+    $("#table-cell-animation").html("");
     if (!length) {
         let data = document.getElementById("data").value;
         let constructor = getConstructor();
@@ -147,6 +148,9 @@ function collisionChange() {
 
 // 生成哈希表
 function genHashTable() {
+    $("#result-table").html('')
+    updateLength($("#length")[0].value)
+    // listAddrModeSwitch()
     let constructor = getConstructor();
     let collision = getCollision();
     let data = document.getElementById("data").value;
@@ -246,7 +250,10 @@ function hashSearch(value = "") {
 
 // ASL计算
 function calculateASL(){
-    if(!ht)return false;
+    if (!ht) {
+        $("#asl-result")[0].textContent = "哈希表还未生成(T_T)";
+        return;
+    }
     let data = document.getElementById("data").value;
     var keys = []
     switch(ht.createMethod){
@@ -254,7 +261,7 @@ function calculateASL(){
             data = data.split('\n');
             data.forEach((ele)=>{
                 if(ele.length > 1 && ele.indexOf(',') !== -1)
-                keys.push(data.split(',')[0])
+                keys.push(ele.split(',')[0])
             })
             break;
         case "digitAnalyze":

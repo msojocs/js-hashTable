@@ -8,8 +8,8 @@ function tableAnimation() {
         let ele = q.shift().data.split(",");
         let key = ele[0];
         let value = ele[1];
-        if ("overList" === key) {
-            // 链式溢出区
+        if ("overList" === key || "overArr" === key) {
+            // 溢出区
             key = "o" + i++;
             queue = queue.then(() => {
                 return promiseFactory(function () {
@@ -18,28 +18,6 @@ function tableAnimation() {
                         insertOverTableCell(ele[2], key, value);
                     }
                     updateTableCell(key, value);
-                });
-            });
-        } else if ("overArr" === key) {
-            // 数组式溢出区
-            key = "o" + i++;
-            queue = queue.then(() => {
-                return promiseFactory(function () {
-                    if (0 === $("#hashEle_" + key).length) {
-                        // 元素不存在
-                        $("#result-table-over").append(
-                            '<div id="list_' +
-                                key +
-                                '" class="list"><div id="hashEle_' +
-                                key +
-                                '" class="cell"><div class="key">' +
-                                key +
-                                '</div><div class="value">' +
-                                value +
-                                "</div></div></div>"
-                        );
-                    }
-                    updateTableCell(key);
                 });
             });
         } else if ("listAddr" === key) {
@@ -79,7 +57,9 @@ function updateTableCell(key, value = null) {
             "   -webkit-animation-fill-mode: forwards;" +
             "}"
     );
+    console.log(key, value)
     if (value) $("#hashEle_" + key + " .value")[0].textContent = value;
+    console.log(key, value)
 }
 
 // 高亮显示找到的元素
@@ -155,7 +135,7 @@ function insertOverTableCell(index, key, value) {
                 key +
                 '</div><div class="value">' +
                 value +
-                "</div></div></div>"
+                '</div></div></div>'
         ).insertAfter("#result-table-over > div:nth-child(" + index + ")");
     }
     $("#table-cell-animation").append(

@@ -1,22 +1,13 @@
 const seed = new Date().getTime(); // 伪随机种子，当次运行时为定值，用于伪随机搜索
 class HashTable {
-
     /**
      * 哈希表对象构造函数
      *
      * @param length 哈希表长度
      * @param create 构造类型[DA, , , , MOD]
      * @param collision 冲突处理类型[OA(OALine|OASecond|OARand), RH, ListAddr, OverAddr]
-     * @param a 直接定址法[Hkey = a * key + b]
-     * @param b 直接定址法[Hkey = a * key + b]
      */
-    constructor(
-        length = 11,
-        create = "directAddr",
-        collision = "dv1",
-        a = 1,
-        b = 0
-    ) {
+    constructor(length = 11, create = "directAddr", collision = "dv1") {
         // 初始化哈希表
         this.storage = [];
         for (var i = 0; i < length; i++) this.storage[i] = null;
@@ -26,14 +17,15 @@ class HashTable {
         this.length = length;
         // 构造方法
         this.createMethod = create;
+        // 直接定址法 Hkey = a * key + b
+        this.a = 1;
+        this.b = 0;
         // 冲突处理方法
         this.collisionMethod = collision;
         // 除留取余法
         this.p = 13;
         // 溢出区
         this.over = null;
-        // 直接定址法 Hkey = a * key + b
-        this.setAB(a, b);
         // 伪随机种子
         this.randSeed = HashTable.seed; // 变化值，产生伪随机序列
         // 再哈希函数列表
@@ -47,9 +39,13 @@ class HashTable {
         this.a = a;
         this.b = b;
     }
+
+    // 再哈希函数
     setReHashExp(exps) {
         this.exps = exps;
     }
+
+    //
     setP(p) {
         this.p = p;
     }
@@ -78,12 +74,12 @@ class HashTable {
     // 填入调用
     push(key, value = null) {
         // TODO:溢出检测，待完善
-        if(this.use >= this.length)return false;
+        if (this.use >= this.length) return false;
 
         if (!value) value = key;
         let Hkey = this.hashFunc(key);
-        
-        if("directAddr" === this.createMethod){
+
+        if ("directAddr" === this.createMethod) {
             // 直接定址法无冲突，直接填入
             this.pushDA(Hkey, value);
             return;
@@ -129,19 +125,19 @@ class HashTable {
     // 开放地址填入元素
     pushOA(Hkey, key, value = key) {
         let d = 1;
+        console.log(key, "Hkey->", Hkey);
         while (
             null !== this.storage[Hkey] &&
             undefined !== this.storage[Hkey]
         ) {
             // Hkey地址被占用
             Hkey = this.collisionOA(key, d++);
-            // console.log("冲突了--新Hkey->", Hkey);
+            console.log("冲突了--新Hkey->", Hkey);
             // throw new Error("");
         }
         this.storage[Hkey] = value;
         this.queue.append(Hkey + "," + value);
     }
-
 
     // 再哈希
     pushReHash(Hkey, key, value) {
@@ -179,11 +175,27 @@ class HashTable {
 
     // 公共溢出区填入[顺序]
     pushOverArr(Hkey, value) {
+        console.log(value, "Hkey->", Hkey);
         if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
             // 冲突
             if (this.over === null) this.over = [];
-            this.over.push(value);
-            this.queue.append("overArr," + value);
+            console.log("冲突！填入溢出区 ", this.over.toString());
+            var i = 0;
+            
+            for (; i < this.over.length; i++) {
+                if (
+                    this.over[i] < value &&
+                    this.over[i + 1] &&
+                    this.over[i + 1] > value
+                ) {
+                    this.over.splice(i + 1, 0, value);
+                    i++;
+                    break;
+                }
+            }
+            if (i === this.over.length) this.over.push(value);
+            
+            this.queue.append("overArr," + value + "," + i);
         } else {
             // 无冲突
             this.storage[Hkey] = value;
@@ -192,8 +204,10 @@ class HashTable {
     }
     // 公共溢出区填入[链式]
     pushOverList(Hkey, value) {
+        console.log(value, "Hkey->", Hkey);
         if (null !== this.storage[Hkey] && undefined !== this.storage[Hkey]) {
             // 冲突了
+            console.log("冲突！填入溢出区");
             if (this.over === null) {
                 this.over = new SingleList();
                 this.over.append(value);
@@ -206,7 +220,7 @@ class HashTable {
                     i++;
                     currNode = currNode.next;
                 }
-                console.log(Hkey, value)
+                console.log(Hkey, value);
                 this.over.insert(currNode.data, value);
                 this.queue.append("overList," + value + "," + i);
             }
@@ -219,7 +233,7 @@ class HashTable {
 
     /**
      * 搜索
-     * 
+     *
      * @param {*} key 待查找关键字
      * @returns {list} [[Hkey, value], cmpCnt, mark]
      */
@@ -311,18 +325,19 @@ class HashTable {
         if (key === this.storage[Hkey]) return [[Hkey, key], 0];
         if (ht.over instanceof SingleList) {
             let result = this.over.find(key);
-            if (result) return [[result[0] - 1, result[1].data], result[0], 'over'];
+            if (result)
+                return [[result[0] - 1, result[1].data], result[0], "over"];
             return false;
         }
         let index = this.over.indexOf(key);
-        if (-1 !== index) return [[index, key], index, 'over'];
+        if (-1 !== index) return [[index, key], index, "over"];
         return false;
     }
 
     // ==============构造=============
     /**
      * 直接定址法
-     * 
+     *
      * @param {*} key 关键字
      * @return {number} 哈希地址
      */
@@ -333,7 +348,7 @@ class HashTable {
 
     /**
      * 数字分析法(学号)
-     * 
+     *
      * @param {*} key 关键字
      * @return {number} 地址
      */
@@ -345,7 +360,7 @@ class HashTable {
 
     /**
      * 平方取中法（BASIC标识符）
-     * 
+     *
      * @param {*} key 关键字
      * @return {number} 哈希地址
      */
@@ -377,10 +392,10 @@ class HashTable {
 
     /**
      * 折叠法（ISBN）
-     * 
+     *
      * @param {*} key 关键字
      * @param {*} mode 模式： 0 普通型 | 1 S型
-     * 
+     *
      * @return {number} 哈希地址
      */
     HF_fold(key = "", mode = 1) {
@@ -404,7 +419,7 @@ class HashTable {
 
     /**
      * 除留取余法
-     * 
+     *
      * @param {*} key 关键字
      * @return {number} 哈希地址
      */
@@ -415,17 +430,18 @@ class HashTable {
 
     /**
      * 冲突处理-开放定址法（包含三个子项）
-     * 
+     *
      * @param {*} key 关键字
      * @param {number} d 采用冲突因子的序号，理论为递增
-     * 
+     *
      * @return {number} 哈希地址
      */
     collisionOA(key, d = 1) {
-        return (
+        let Hkey =
             (this.hashFunc(key) + this["CF_" + this.collisionMethod](d)) %
-            this.length
-        );
+            this.length;
+        if (Hkey < 0) return this.length + Hkey;
+        return Hkey;
     }
 
     // -----------开放定址法----------
@@ -471,10 +487,10 @@ class HashTable {
 
     /**
      * 再哈希
-     * 
+     *
      * @param {*} key 关键字
      * @param {*} d 要采用的新哈希函数的序号
-     * 
+     *
      * @return {number} 哈希地址[冲突处理后]
      */
     CF_reHash(key, d) {
@@ -485,7 +501,6 @@ class HashTable {
         console.log("-->", eval(exp));
         return eval(exp);
     }
-
 }
 
 // ------------------test area---------------测试区域--------------test area---------------测试区域--------------//
