@@ -202,7 +202,7 @@ class HashTable {
             this.queue.append(Hkey + "," + value);
         }
     }
-    
+
     // 公共溢出区填入[链式]
     pushOverList(Hkey, value) {
         console.log(value, "Hkey->", Hkey);
@@ -318,8 +318,9 @@ class HashTable {
             Hkey = this.CF_reHash(key, d++);
         }
         if (Hkey) {
-            return [[Hkey, this.storage[Hkey]], 0];
+            return [[Hkey, this.storage[Hkey]], d + 1];
         }
+        return false
     }
     // 溢出区
     searchOver(Hkey, key) {

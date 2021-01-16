@@ -4,7 +4,7 @@ function exampleChange(e) {
     let data = "";
     switch (e) {
         case "directAddr_example1":
-            for (var i = 1; i <= 100; i++) {
+            for (var i = 1; i <= 10; i++) {
                 data += i + "," + i * 100 + "\n";
             }
             document.getElementById("b").value = 0;
