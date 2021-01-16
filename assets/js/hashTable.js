@@ -202,6 +202,7 @@ class HashTable {
             this.queue.append(Hkey + "," + value);
         }
     }
+    
     // 公共溢出区填入[链式]
     pushOverList(Hkey, value) {
         console.log(value, "Hkey->", Hkey);
@@ -329,8 +330,22 @@ class HashTable {
                 return [[result[0] - 1, result[1].data], result[0], "over"];
             return false;
         }
-        let index = this.over.indexOf(key);
-        if (-1 !== index) return [[index, key], index, "over"];
+        // let index = this.over.indexOf(key);
+        // if (-1 !== index) return [[index, key], index + 1, "over"];
+        let cnt = 0;
+        let low = 0;
+        let high = this.over.length - 1;
+        while(low <= high){
+            cnt++;
+            let mid = parseInt((low + high) / 2);
+            console.log('mid', mid)
+            if(key === this.over[mid])
+            {
+                return [[mid, key], cnt, "over"]
+            }
+            if(this.over[mid] < key)low = mid + 1;
+            else high = mid - 1;
+        }
         return false;
     }
 
@@ -355,7 +370,7 @@ class HashTable {
     HF_digitAnalyze(key) {
         key = key.substr(-3);
         // throw new Error("")
-        return parseInt(key);
+        return parseInt(key) % this.length;
     }
 
     /**

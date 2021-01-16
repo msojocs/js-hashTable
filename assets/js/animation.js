@@ -57,9 +57,8 @@ function updateTableCell(key, value = null) {
             "   -webkit-animation-fill-mode: forwards;" +
             "}"
     );
-    console.log(key, value)
     if (value) $("#hashEle_" + key + " .value")[0].textContent = value;
-    console.log(key, value)
+    
 }
 
 // 高亮显示找到的元素
