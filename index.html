@@ -109,6 +109,7 @@
     <!-- 结果表格 -->
     <style id="table-cell-animation"></style>
     <style>
+        /* 颜色定义 */
         /* Standard syntax */
         @keyframes table-cell-display {
             50% {
@@ -151,21 +152,23 @@
     <br />
 
     <!-- 搜索框 -->
-    <div class="search-group">
-        <div class="search bar6">
-            <span class="search-group-prepend">关键字</span>
-            <input type="text" id="search-value" placeholder="请输入关键字...">
-            <div class="search-group-append">
-                <button onclick="hashSearch()">搜索</button>
+    <div style="border: 1px solid #fff;border-radius: 5px;padding: .5rem;">
+        <div class="search-group">
+            <div class="search bar6">
+                <span class="search-group-prepend">关键字</span>
+                <input type="text" id="search-value" placeholder="请输入关键字...">
+                <div class="search-group-append">
+                    <button onclick="hashSearch()">搜索</button>
+                </div>
             </div>
-        </div>
 
-        <p>搜索情况：<span id="search-result"></span></p>
-    </div>
-    <br />
-    <button onclick="calculateASL()">计算ASL</button>
-    <div>
-        <p>ASL:<span id="asl-result"></span></p>
+            <p>搜索情况：<span id="search-result"></span></p>
+        </div>
+        <br />
+        <button onclick="calculateASL()">计算ASL</button>
+        <div>
+            <p>ASL:<span id="asl-result"></span></p>
+        </div>
     </div>
     <script>
         // onerror = function(msg, url, row,col) {
